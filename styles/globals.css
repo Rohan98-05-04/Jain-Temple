@@ -1,0 +1,312 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Quicksand', sans-serif;
+  background: rgb(255, 255, 255) !important;
+  font-weight: 400;
+  font-size: 14px;
+}
+h1, h2, h3, h4, h5, h6{
+  margin: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mr-5{
+  margin-right: 5px;
+}
+.ml-5{
+  margin-left: 5px;
+}
+.s-10{
+  font-size: 10px;
+}
+.s-12{
+  font-size: 12px;
+}
+.s-14{
+  font-size: 14px;
+}
+.s-16{
+  font-size: 16px;
+}
+.tc-grey{
+  color: grey;
+}
+
+.t-center{
+  text-align: center;
+}
+.flex{
+  display: flex;
+}
+.justify-center{
+  justify-content: center;
+}
+.align-center{
+  align-items: center;
+}
+.justify-sb{
+  justify-content: space-between;
+}
+
+ul li{
+  list-style: none;
+}
+
+.content{
+  width: calc(100% - 300px);
+  position: relative;
+  left: 300px;
+}
+
+.link{
+  color: #000;
+}
+
+.link:hover{
+  font-weight: 500;
+}
+
+@media screen and (max-width: 360px) {
+  .content{
+    width: 100%;
+    left: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .content{
+    width: 100%;
+    left: 0;
+  }
+}
+@media screen and (min-width: 768px) {
+  .graphCanvas{
+    width: 100%;
+    height: auto;
+  }
+}
+tr{
+  list-style: 35px
+}
+th{
+  font-size: 1.2rem;
+}
+td{
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+a{
+  text-decoration: none !important;
+
+}
+.active>.page-link{
+  background-color: #f68945 !important;
+  border: none;
+}
+.red{
+  color: red;
+}
+.blue{
+  color: blue;
+}
+.form-control {
+  border: 2px solid black !important;
+}
+.css-13cymwt-control{
+  border: 2px solid black !important;
+  height: 3.5rem;
+  
+}
+input{
+  border: 2px solid black ;
+  border-radius: 0.2rem;
+  width: 100%;
+  height: 3.5rem;
+  padding: 0.7rem;
+  
+}
+textarea{
+  border: 2px solid black ;
+  border-radius: 0.2rem;
+  width: 100%;
+  height: 3.5rem;
+  padding: 0.7rem;
+  
+}
+.react-datepicker-wrapper{
+  width: 100%;
+
+}
+.searchWrapper{
+  border: 2px solid black !important;
+  background-color: white;
+  height: 3.5rem;
+
+}
+.searchWrapper input{
+  height: 2.5rem;
+}
+.css-qbdosj-Input{
+  height: 3rem;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Remove arrow icons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+label{
+  font-size: 1.2rem;
+    font-weight: 500;
+}
+.formLabel{
+  font-size: 1.2rem;
+    font-weight: 500;
+}
+/* .form-check-input[type=radio] {
+  margin-top: 0.5rem;
+} */
+.form-check label {
+  margin-right: 1rem;
+}
+.label-form{
+  /* flex: 1 1 calc(31% - 2rem); */
+  width: calc(31% - 2rem);
+  /* display: flex; */
+  margin-right: 3rem;
+  margin-bottom: 2rem;
+}
+.selectDropdown input{
+  font-size: 1.5rem !important;
+}
+.formMainDiv{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.addDonarSubmitBtnMain{
+  width: 15%;
+margin-top: 2rem;
+}
+.addDonarSubmitBtn{
+background-color: #f68945;
+  width: 100%;
+  border-radius: 2rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0.7rem;
+  border: none;
+  color: white;
+  font-weight: 500;
+}
+.nextDonarSubmitBtnMain{
+  
+  margin-left: auto;
+  width: 15%;
+}
+.nextDonarSubmitBtn{
+background-color: #f68945;
+  width: 100%;
+  border-radius: 2rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.DonarViewMain .DonarViewcard table {
+  border: none;
+  font-size: 16px;
+  /* height: 270px; */
+  width: 80%;
+}
+.DonarViewMain .DonarViewcard table tr {
+  height: 3rem;
+}
+.DonarViewMain .DonarViewcard table tr {
+  height: 3rem;
+}
+.DonarViewMain .DonarViewcard {
+  background-color: #fff;
+  border-radius: 18px;
+  box-shadow: 1px 1px 8px 0 grey;
+  height: auto;
+  margin-bottom: 20px;
+  padding: 20px 0 20px 50px;
+}
+.DonarViewMain {
+  margin-top: 4%;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 28px;
+  padding: 0 10px;
+  width: 58%;
+}
+.donationCategoryAmounts{
+  white-space: pre;
+width: 100%;
+}
+
+.input-group .btn{
+  z-index: 0 !important;
+}
+
+/* Switch */
+
+.custom-switch {
+  margin-left: 1rem;
+  margin-right: 1rem;
+
+}
+.react-switch-bg{
+  height: 18px !important;
+  width: 40px !important;
+}
+.react-switch-bg div{
+  height: 20px !important;
+  width: 20px !important;
+}
+.react-switch-handle{
+  height: 16px !important;
+  width: 16px !important;
+  transform: translateX(23px) !important;
+
+}
+.searchBtn{
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+@media screen and (max-width: 768px) {
+  .label-form{
+    /* flex: 1 1 calc(31% - 2rem); */
+    width: calc(100% - 2rem);
+    /* display: flex; */
+    margin-right: 3rem;
+    margin-bottom: 2rem;
+  }
+  .addDonarSubmitBtnMain{
+    width: 50%;
+  }
+}
+/* @media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    color: white;
+    background: black;
+  }
+} */

@@ -1,0 +1,199 @@
+.content{
+    width: calc(100% - 300px);
+    position: relative;
+    left: 300px;
+  }
+  
+  .card-container{
+    width: 400px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  
+  .date-placeholder{
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .card-container{
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  }
+  
+  
+  
+  /* dashboard */
+  .dashboard{
+    padding: 2rem;
+    width: 100%;
+  
+  }
+  
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: space-between; */
+    margin: -1rem;
+    width: 100%;
+  }
+  
+  .box {
+    /* flex:  calc(20% - 2rem); */
+    margin: 1rem;
+    background-color: #f68945;
+    border-radius: 1rem;
+    display: flex;
+    padding: 1rem;
+    box-sizing: border-box;
+    width: calc(25% - 2rem);
+  }
+  .boxTotal {
+    flex: 1 1 calc(50% - 2rem);
+    margin: 1rem;
+    background-color: #f68945;
+    border-radius: 1rem;
+    display: flex;
+    padding: 1rem;
+    box-sizing: border-box;
+    width: calc(25% - 2rem);
+  }
+  .boxHead{
+    color: bisque;
+    font-weight: 700;
+  }
+  .boxAmount{
+    color: white;
+    font-weight: 700;
+  }
+  .graphCard{
+    width: 48% !important;
+  }
+  .iconContainer{
+    margin-left: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    border: 1px solid white;
+    background-color: white;
+    padding: 3px;
+    border-radius: 10px;
+  }
+  .graphcontainer{
+    display: flex;
+      flex-wrap: wrap;
+      
+      width: 100%;
+  }
+  .TableSection{
+    width: 100%;
+  }
+   .ChartMain{
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+  width: 100%;
+  
+  }
+   .donationChartMain{
+    width: 48%;
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: #ffe8f2;
+    height: 20rem;
+    /* margin-right: 2rem; */
+  
+  }
+  
+  
+  .ChartMain{
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+  
+  
+  }
+   .donationChartMain{
+    width: 48%;
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: #ffe8f2;
+    height: 20rem;
+    /* margin-right: 2rem; */
+  
+  }
+  
+  .hrMain{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .hr{
+    width: 50%;
+    border: none; /* Remove the default border */
+    border-top: 2px solid black;
+  }
+  
+  /* Adjustments for mobile screens */
+  @media screen and (max-width: 768px) {
+   
+    .ChartMain{
+      display: block;
+      width: 75%;
+    }
+    .donationChartMain{
+      width: 100%;
+      padding: 1rem;
+      border-radius: 1rem;
+      background-color: #ffe8f2;
+      height: 12rem;
+      margin-bottom: 2rem;
+  
+    }
+  
+  }
+  /* Adjustments for mobile screens */
+  @media screen and (max-width: 768px) {
+    .box {
+      flex: 1 1 calc(50% - 2rem);
+      width: calc(50% - 2rem);
+    }
+    .ChartMain{
+      display: block;
+    }
+    .donationChartMain{
+      width: 100%;
+      padding: 1rem;
+      border-radius: 1rem;
+      background-color: #ffe8f2;
+      height: 12rem;
+      margin-bottom: 2rem;
+  
+    }
+  
+    .iconContainer{
+      padding: 2px;
+    }
+  }
+  .button{
+    background-color: #f68945 !important;
+    color: white !important;
+
+}
+  .addDonarsearchMain{
+    width: auto !important;
+    margin-right: 3rem;
+    margin-left: auto;
+
+}
+.addDonarSearch{
+    height: auto;
+    border: 1px solid black !important ;
+
+}
+  
+.pagination{
+    margin-top: 3rem;
+}

@@ -1,0 +1,34 @@
+.donationButtons{
+    height: 2rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.button{
+    background-color: #f68945 !important;
+    color: white !important;
+
+}
+.addDonarsearchMain{
+    width: auto !important;
+}
+.addDonarSearch{
+    height: auto;
+    border: 1px solid black !important ;
+
+}
+
+.formHeaderext{
+    margin-bottom: 3rem;
+    text-decoration-line: underline;
+}
+
+@media screen and (max-width: 768px) {
+    .addDonarsearchMain{
+        width: 100% !important;
+        margin-bottom: 1rem;
+    }
+   .table-responsive{
+    margin-top: 2rem;
+   }
+  }

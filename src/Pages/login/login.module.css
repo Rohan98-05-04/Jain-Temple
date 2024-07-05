@@ -1,0 +1,72 @@
+.container{
+
+}
+.login-container{
+    width: 800px;
+    min-height: 400px;
+    background: #fff;
+    margin: 100px auto;
+    display: flex;
+    border: 2px solid black;
+}
+
+.brand-container{
+    width: 50%;
+    min-height: 100%;
+    background: #606060;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+
+}
+
+.form-container{
+    width: 50%;
+}
+
+.logo-explain{
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.sm-brand-container{
+    display: none;
+}
+.loginFormMain{
+    padding: 15px 30px;
+}
+.inputMain{
+    width: 100%;
+}
+.loginBtn{
+    height: 3rem;
+    background-color: #f68945;
+    width: 100%;
+    border-radius: 0.4rem;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    margin-left: auto;
+    border: none;
+    margin-right: auto;
+  }
+@media screen and (max-width: 768px){
+    .sm-brand-container{
+        display: block;
+    }
+    .login-container{
+        width: 90%;
+        margin: 10% 5%;
+        height: auto;
+    }
+    .brand-container{
+        display: none;
+    }
+    .form-container{
+        width: 100%;
+    }
+}
