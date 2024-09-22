@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Header from "../Header";
-import SidebarNavigation from "../SidebarNavigation";
+import Sidebar from "../SidebarNavigation";
 
 const Layout = ({ children }) => {
   const [sidebarMenuActive, setSidebarMenuActive] = useState(true);
@@ -14,14 +14,7 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      <SidebarNavigation
-        toggleSidebarMenu={toggleSidebarMenu}
-        sidebarMenuActive={sidebarMenuActive}
-      />
-      <Header
-        toggleSidebarMenu={toggleSidebarMenu}
-        showSidebarMenu={showSidebarMenu}
-      />
+      <Sidebar />
       <section className="content">
         {children}
       </section>

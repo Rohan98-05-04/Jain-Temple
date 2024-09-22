@@ -2,11 +2,17 @@ import { ToastContainer } from 'react-toastify'
 import '../styles/globals.css'
 import Script from 'next/script'
 import 'react-toastify/dist/ReactToastify.css';
+import Head from 'next/head';
 
 function MyApp({ Component, pageProps }) {
   return( 
   <>
   <ToastContainer/>
+  <Head>
+    <title>Jain Admin</title>
+    <meta name="Jain Accounting System"/>
+    <link rel="icon" href="../img/Swastik-Logo.png" />
+  </Head>
 
 <Component {...pageProps} />;
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossOrigin="anonymous"/>

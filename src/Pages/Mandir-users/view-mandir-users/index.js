@@ -62,11 +62,11 @@ const ViewMandirUser = () => {
    <>
    <Section>
    {isLoading &&    <Spinner/>  }
-   <div class="DonarViewMain">
+   <div className="DonarViewMain">
         <h2 className='text-center'>Donar</h2>
-        <div class="DonarViewcard">
-            <div class="card-body">
-                <i class="fa fa-pen fa-xs edit"></i>
+        <div className="DonarViewcard">
+            <div className="card-body">
+                <i className="fa fa-pen fa-xs edit"></i>
                 <table>
                     <tbody>
                     {donarData?.firstName && (
@@ -139,9 +139,9 @@ const ViewMandirUser = () => {
         </div>
         {donarData?.members && donarData?.members.length > 0 && (
 
-        <div class="DonarViewcard">
-            <div class="card-body">
-                <i class="fa fa-pen fa-xs edit"></i>
+        <div className="DonarViewcard">
+            <div className="card-body">
+                <i className="fa fa-pen fa-xs edit"></i>
                     {donarData?.members.map((member, index) => (
   <div key={index} className={`${styles.memberContainer} border p-2`}>
     <h2>Member {index + 1}</h2>

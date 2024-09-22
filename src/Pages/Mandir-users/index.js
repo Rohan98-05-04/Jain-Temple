@@ -1,201 +1,205 @@
 import Link from 'next/link';
-import React from 'react';
-import Table from 'react-bootstrap/Table';
-import { useEffect , useState } from 'react';
-import { API_BASE_URL } from '../../../utils/config';
+import React, { useEffect, useState } from 'react';
 import Pagination from "react-js-pagination";
 import Switch from "react-switch";
 import { ToastContainer, toast } from 'react-toastify';
 import Section from '@aio/components/Section';
-import styles from "./mandir-users.module.css";
 import { AiFillEdit } from 'react-icons/ai';
 import { GrView } from 'react-icons/gr';
 import 'react-toastify/dist/ReactToastify.css';
-import Spinner from '../../components/Spinner'; 
-
+import Spinner from '../../components/Spinner';
+import { API_BASE_URL } from 'utils/config';
+import { AiOutlineSearch } from "react-icons/ai";
+import Modal from './add-mandir-users/modal';
 
 const MandirUsers = () => {
-const [donorData, setDonorData] = useState([]);
-const [Data, setData] = useState([]);
-const [activePage, setActivePage] = useState(1);
-const [page, setPage] = useState(1);
-const [size, setsize] = useState(8);
-const [search, setSearch] = useState('');
-const [isActive, setIsActive] = useState([]);
-const [donarId, setdonarId] = useState([]);
-const [isLoading, setIsLoading] = useState(false);
+  const [donorData, setDonorData] = useState([]);
+  const [Data, setData] = useState([]);
+  const [activePage, setActivePage] = useState(1);
+  const [size, setSize] = useState(8);
+  const [search, setSearch] = useState('');
+  const [isActive, setIsActive] = useState([]);
+  const [donarId, setDonarId] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
 
-const handleSwitchChange = (checked, index) => {
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
 
-  const updatedIs_id = [...donarId];
-  const updatedIsActive = [...isActive];
-  updatedIsActive[index] = checked;
-  setIsActive(updatedIsActive);
-  const token = localStorage.getItem('token');
-  const parseToken = JSON.parse(token) || {};
-  setIsLoading(true);
-  
-  const fetchData = async () => {
-    const response = await fetch(`${API_BASE_URL}/donor/manage-status/${checked}/${updatedIs_id[index]}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${parseToken}`,
-        
-      },
-      body: JSON.stringify({ "isParent":true}),
-    });
-    
-    if (response.ok) {
-      
-      const data = await response.json();
-      toast.success(data.data.message, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      setIsLoading(false);
-    } else {
-      const data = await response.json();
-      toast.error(data.errorMessage, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      setIsLoading(false);
-    }
-  }
-  fetchData();
-};
+  const handleSwitchChange = (checked, index) => {
+    const updatedIs_id = [...donarId];
+    const updatedIsActive = [...isActive];
+    updatedIsActive[index] = checked;
+    setIsActive(updatedIsActive);
+    const token = localStorage.getItem('token');
+    const parseToken = JSON.parse(token) || {};
+    setIsLoading(true);
 
-const handleSearchChange = (event) => {
-  setSearch(event.target.value);
-};
-useEffect(() => {
-  
-  const token = localStorage.getItem('token');
-  const parseToken = JSON.parse(token) || {};
-  setIsLoading(true);
-  const fetchData = async () => {
-    const response = await fetch(`${API_BASE_URL}/donor/getalldonor?page=${activePage}&size=${size}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${parseToken}`,
-        
-      },
-      body: JSON.stringify(),
-    });
-    
-    if (response.ok) {
-      
-      const data = await response.json();
-      setData(data.data);
-      console.log('dataMadir',data)
-      setDonorData(data.data.data);
-      const initialIsActive = data.data.data.map((donor) => donor.isActive);
-      setIsActive(initialIsActive);
-      const initialdonarId = data.data.data.map((donor) => donor._id);
-      setdonarId(initialdonarId);
-      setIsLoading(false);
-    } else {
-      const data = await response.json();
-      toast.error(data.errorMessage, {
-        position: toast.POSITION.TOP_RIGHT,
+    const fetchData = async () => {
+      const response = await fetch(`${API_BASE_URL}/donor/manage-status/${checked}/${updatedIs_id[index]}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${parseToken}`,
+        },
+        body: JSON.stringify({ "isParent": true }),
       });
-      setIsLoading(false);
-    }
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.data.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setIsLoading(false);
+      } else {
+        const data = await response.json();
+        toast.error(data.errorMessage, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setIsLoading(false);
+      }
     }
     fetchData();
-}, [activePage,search]);
-const handlePageChange = (pageNumber) => {
-  setActivePage( pageNumber);
-}
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const parseToken = JSON.parse(token) || {};
+    setIsLoading(true);
+    const fetchData = async () => {
+      const response = await fetch(`${API_BASE_URL}/donor/getalldonor?page=${activePage}&size=${size}&search=${search}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${parseToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setData(data.data);
+        setDonorData(data.data.data);
+        const initialIsActive = data.data.data.map((donor) => donor.isActive);
+        setIsActive(initialIsActive);
+        const initialDonarId = data.data.data.map((donor) => donor._id);
+        setDonarId(initialDonarId);
+        setIsLoading(false);
+      } else {
+        const data = await response.json();
+        toast.error(data.errorMessage, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [activePage, search]);
+
+  const handlePageChange = (pageNumber) => {
+    setActivePage(pageNumber);
+  }
+
   return (
-    <div className='donarPage'>
-       {isLoading &&    <Spinner/>  }
-          <ToastContainer position="top-right" autoClose={5000} />
+    <div className="p-4 md:p-8">
+      {isLoading && <Spinner />}
+      <ToastContainer position="top-right" autoClose={5000} />
 
-        <div className='donarDetailMainPage'>
+      <div className="bg-white rounded-lg shadow p-4">
         <Section>
-        <div>
-  <h2 className={`${styles.formHeaderext}`}>Mandir users</h2>
-</div>
-      <div className={`${styles.donationButtons} d-flex justify-content-between mb-3  `} >
-        {/* Search Bar */}
-        <div className={`${styles.addDonarsearchMain} input-group `}>
-          <input type="text" className={`${styles.addDonarSearch} form-control  `}
-           placeholder="Search"
-           onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search" />
-          <div className="input-group-append">
-            <button onClick={handleSearchChange} className={`btn btn-outline-secondary searchBtn ${styles.button}`} type="button">
-              Search
-            </button>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">Mandir users</h2>
           </div>
-          {/* <button onClick={notify}>Notify!</button>
-        <ToastContainer /> */}
-        </div>
-        {/* Add Donar Button */}
-       <Link href='/mandir-users/add-mandir-users'>  <button className={`btn addDonarBtn ${styles.button}`}>Add mandir user</button></Link>
-
+          <div className="flex flex-col md:flex-row justify-between mb-3">
+            {/* Search Bar */}
+            <div className="relative mb-4 md:mb-0">
+              <input
+                type="text"
+                className="border rounded-md px-2 h-10 w-full md:w-64 focus:ring-orange-400"
+                placeholder="Search"
+                onChange={(e) => setSearch(e.target.value)}
+                aria-label="Search"
+              />
+              <button className="absolute right-0 top-0 text-center  text-2xl  bg-orange-400 text-white rounded-md px-2 py-2">
+                <AiOutlineSearch />
+              </button>
+            </div>
+            {/* Add Donar Button */}
+            <div>
+              <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add mandir user</button>
+            </div>
+          </div>
+        </Section>
+        <Section>
+          {/* Bootstrap Table */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="w-40 px-6 py-3 border text-gray-600">First Name</th>
+                  <th className="w-40 px-6 py-3 border text-gray-600">Contact No.</th>
+                  <th className="px-6 py-3 border text-gray-600">Email</th>
+                  <th className="w-40 px-6 py-3 border text-gray-600">Status</th>
+                  <th className="w-40 px-6 py-3 border text-gray-600">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {donorData.map((donor, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-3 border">{donor.firstName}</td>
+                    <td className="px-6 py-3 border">
+                      {/* Display the phone number */}
+                      {donor.phoneNumbers?.length > 0 ? (
+                        donor.phoneNumbers.map((phone, idx) => (
+                          <div key={idx}>{phone.Phonenumber1}</div>
+                        ))
+                      ) : (
+                        <div>No phone number available</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-3 border">{donor.email}</td>
+                    <td className="px-6 py-3 border">
+                      {/* Display isActive status */}
+                      {donor.isActive ? (
+                        <span className="text-green-600">Active</span>
+                      ) : (
+                        <span className="text-red-600">Deactivated</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-3 flex items-center space-x-2">
+                      <Link href={`/mandir-users/${donor._id}`}>
+                        <AiFillEdit className="text-red-600 hover:text-red-800" />
+                      </Link>
+                      <Switch
+                        onChange={(checked) => handleSwitchChange(checked, index)}
+                        checked={isActive[index]}
+                        className="custom-switch"
+                      />
+                      <Link href={`/mandir-users/view-mandir-user/${donor.user_detail || donor._id}`}>
+                        <GrView className="text-blue-600 hover:text-blue-800" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+        <Section>
+          <div>
+            <Pagination
+              activePage={activePage}
+              itemsCountPerPage={size}
+              totalItemsCount={Data?.totalDocuments || 0}
+              pageRangeDisplayed={5}
+              onChange={handlePageChange}
+              itemClass="page-item"
+              linkClass="page-link"
+            />
+          </div>
+        </Section>
       </div>
-      </Section>
-      <Section>
-
-      {/* Bootstrap Table */}
-      <div className='table-responsive w-100'>
-      <table className='table '>
-      <thead>
-        <tr>
-          <th scope="col">First Name</th>
-          {/* <th scope="col">Phone number</th> */}
-          <th scope="col">Email</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-      {donorData.map((donor, index) => (
-              <tr key={index}>
-                <td>{donor.firstName}</td>
-                {/* <td>{donor.phoneNumbers[0].Phonenumber1}</td> */}
-                <td>{donor.email}</td>
-                <td className='d-flex'><Link href={`/mandir-users/${donor._id}`}>
-                <AiFillEdit className='red'/></Link>
-                    {/* <label> */}
-        <Switch  onChange={(checked) => handleSwitchChange(checked, index)}
-          checked={isActive[index]} className="custom-switch"
-          
-          />
-           {!donor.user_detail && (
-         <Link href={`/mandir-users/view-mandir-user/${donor._id}`}>
-         <GrView className='blue'/></Link>
-           )}
-           {donor.user_detail && (
-         <Link href={`/mandir-users/view-mandir-user/${donor.user_detail}`}>
-         <GrView className='blue'/></Link>
-           )}
-      {/* </label> */}
-                     </td>
-              </tr>
-            ))}
-      </tbody>
-    </table>
-    </div>
-    </Section>
-    <Section>
-
-      <div>
-        <Pagination
-          activePage={activePage}
-          itemsCountPerPage={size}
-          totalItemsCount={Data?.totalDocuments || 0}
-          pageRangeDisplayed={5}
-          onChange={handlePageChange.bind(this)}
-          itemClass="page-item"
-      linkClass="page-link"
-
-        />
-      </div>
-      </Section>
-
-    </div>
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+      </Modal>
     </div>
   );
 };
