@@ -4,11 +4,13 @@ import { API_WEB_URL } from "utils/config";
 
 export const config = {
   matcher: [
-    "/mandir-users",
-    "/committee-members",
-    "/donation",
-    "/event",
-    "/expenses",
+    "/mandir-users/:path*",
+    "/committee-members/:path*",
+    "/donation/:path*",
+    "/event/:path*",
+    "/expenses/:path*",
+    "/boli/:path*",
+    "/masters/:path*"
   ],
 };
 

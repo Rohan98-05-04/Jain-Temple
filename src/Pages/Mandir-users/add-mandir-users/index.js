@@ -10,7 +10,6 @@ import Section from "@aio/components/Section";
 import styles from "../mandir-users.module.css";
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from '../../../components/Spinner';
-import Modal from "./modal";
 
 
 
@@ -188,7 +187,7 @@ export default function AddMandirUsers() {
     const token = localStorage.getItem('token');
     const parseToken = JSON.parse(token) || {};
     let inputData = {
-      image, firstName, lastName, phoneNumbers: [{ Phonenumber1: phoneNumberOne, Phonenumber2: phoneNumberTwo }], gotr, dateOfAnniversary, dob,
+      image, firstName, lastName, phoneNumbers: [{ Phonenumber1: phoneNumberOne, Phonenumber2: phoneNumberTwo }], gotr, role: selectedRole, dateOfAnniversary, dob,
       occupation, isHead, email, aadharNo, aadharCardImage: aadharcardimage, bloodGroup, address: {
         line_1: addressLineOne
         , line_2: addressLineTwo, line_3: addressLineThree,
@@ -227,7 +226,29 @@ export default function AddMandirUsers() {
     }
     fetchData();
   };
-  
+
+  const [donationTypes, setDonationTypes] = useState([]);
+  const [selectedRole, setSelectedRole] = useState('');
+
+  useEffect(() => {
+    const fetchBoliHeads = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/role/getAllMemberRoles`);
+        const result = await response.json();
+        setDonationTypes(result.data.roles);
+        console.log(result);
+      } catch (error) {
+        console.error("Error fetching Boli Heads:", error);
+      }
+    };
+
+    fetchBoliHeads();
+  }, []);
+
+  const handleRoleChange = (e) => {
+    const selectedValue = e.target.value;
+    setSelectedRole(selectedValue);
+  };
 
   return (
     <Section>
@@ -269,32 +290,6 @@ export default function AddMandirUsers() {
                   onChange={(e) => setGotr(e.target.value)}
                 />
               </div>
-              {/* <div className="label-form lastName">
-            <div className="upload-image-box">
-      <label className="upload-label">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="upload-input"
-        />
-        {image ? (
-          <div className="image-preview-box">
-            <img src={image} alt="Preview" className="image-preview" />
-          </div>
-        ) : (
-          <div className="upload-placeholder">
-            <span>Upload Image</span>
-          </div>
-        )}
-      </label>
-      {image && (
-        <button onClick={handleUpload} className="upload-button">
-          Upload
-        </button>
-      )}
-    </div>
-              </div> */}
               <div className="label-form phoneOne">
                 <label htmlFor="PhoneNumberOne">Whatsapp Number</label><br />
                 <input
@@ -493,6 +488,20 @@ export default function AddMandirUsers() {
                   onChange={(e) => setPincode(e.target.value)}
                 />
               </div>
+              <div className="label-form role">
+                <label htmlFor="role">Role</label><br />
+                <select
+                  name="role"
+                  value={selectedRole} // Set the value to the selected role state
+                  onChange={handleRoleChange}
+                  className="border border-gray-950 p-1 py-3 w-full"
+                >
+                  <option value="" disabled>Select Role Type</option>
+                  {donationTypes?.map((type) => (
+                    <option key={type._id} value={type._id}>{type.nameHindi}</option>
+                  ))}
+                </select>
+              </div>
               {/* <div className="label-form country">
                 <label htmlFor="country">Country</label><br />
               <input
@@ -503,6 +512,7 @@ export default function AddMandirUsers() {
                 onChange={(e) => setCountry(e.target.value)}
                 />
                 </div> */}
+
             </div>
 
             {members.map((member, index) => (

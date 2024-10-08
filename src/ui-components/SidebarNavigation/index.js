@@ -1,25 +1,42 @@
-"use client"
+"use client";
 import Link from 'next/link';
 import Logo from "../Logo";
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import styles from './SidebarNavigation.module.css'; // CSS module for styling
+import styles from './SidebarNavigation.module.css';
 import { BsSpeedometer2 } from "react-icons/bs";
 import { GiExpense } from "react-icons/gi";
 import { FaDonate } from "react-icons/fa";
 import { MdOutlineEventNote } from "react-icons/md";
 import { IoIosPeople } from "react-icons/io";
 import { FaUserShield } from "react-icons/fa";
+import Cookies from 'js-cookie';
 
 const Sidebar = () => {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false); // State to manage sidebar visibility
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEcommerceOpen, setIsEcommerceOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
+  const toggleEcommerceDropdown = () => {
+    setIsEcommerceOpen(!isEcommerceOpen);
+  };
+
   const iconStyle = { fontSize: '24px' };
+
+  const handleSignOut = () => {
+    Cookies.remove('token'); // Remove token from cookies
+    router.push('/login');
+  };
+
+  const isMasterActive = [
+    '/masters/typedonation',
+    '/masters/role',
+    '/masters/bolihead'
+  ].includes(router.pathname);
 
   return (
     <>
@@ -51,45 +68,51 @@ const Sidebar = () => {
             <Logo />
             <div className={styles['logo-explain']}>Jain Temple</div>
           </div>
+
           <ul className="space-y-2 font-medium text-lg">
-            {[
-              {
-                href: '/dashboard',
-                label: 'Dashboard',
-                icon: (props) => <BsSpeedometer2 {...props} style={iconStyle} />
-              },
-              {
-                href: '/mandir-users',
-                label: 'Mandir users',
-                icon: (props) => <FaUserShield {...props} style={iconStyle} />
-              },
-              {
-                href: '/donation',
-                label: 'Donation',
-                icon: (props) => <FaDonate {...props} style={iconStyle} />
-              },
-              {
-                href: '/expenses',
-                label: 'Expenses',
-                icon: (props) => <GiExpense {...props} style={iconStyle} />
-              },
-              {
-                href: '/event',
-                label: 'Event',
-                icon: (props) => <MdOutlineEventNote {...props} style={iconStyle} />
-              },
-              {
-                href: '/committee-members',
-                label: 'Committee members',
-                icon: (props) => <IoIosPeople {...props} style={iconStyle} />
-              },
-              { href: '/logout', 
-                label: 'Sign Out', 
-                icon: (props) => <IoIosPeople {...props} style={iconStyle} /> 
-              },
-            ].map(({ href, label, icon: Icon }) => (
+            {[{
+              href: '/dashboard',
+              label: 'Dashboard',
+              icon: (props) => <BsSpeedometer2 {...props} style={iconStyle} />
+            },
+            {
+              href: '/mandir-users',
+              label: 'Mandir Donation',
+              icon: (props) => <FaUserShield {...props} style={iconStyle} />
+            },
+            {
+              href: '/donation',
+              label: 'Donation',
+              icon: (props) => <FaDonate {...props} style={iconStyle} />
+            },
+            {
+              href: '/expenses',
+              label: 'Expenses',
+              icon: (props) => <GiExpense {...props} style={iconStyle} />
+            },
+            {
+              href: '/event',
+              label: 'Event',
+              icon: (props) => <MdOutlineEventNote {...props} style={iconStyle} />
+            },
+            {
+              href: '/boli',
+              label: 'Boli',
+              icon: (props) => <MdOutlineEventNote {...props} style={iconStyle} />
+            },
+            {
+              href: '/committee-members',
+              label: 'Committee members',
+              icon: (props) => <IoIosPeople {...props} style={iconStyle} />
+            },
+            {
+              href: '/masters',
+              label: 'Master',
+              icon: (props) => <IoIosPeople {...props} style={iconStyle} />
+            },
+            ].map(({ href, label, icon: Icon, onClick }) => (
               <li key={href}>
-                <Link href={href} passHref>
+                <Link href={href} passHref onClick={onClick}>
                   <div className={`flex items-center p-2 rounded-lg hover:text-white hover:bg-orange-400 dark:hover:bg-gray-700 group ${router.pathname === href ? styles.active : 'text-gray-900'}`}>
                     <Icon />
                     <span className="flex-1 ms-3 whitespace-nowrap">{label}</span>
@@ -97,6 +120,13 @@ const Sidebar = () => {
                 </Link>
               </li>
             ))}
+
+            <div onClick={handleSignOut}  className="flex items-center p-2 rounded-lg hover:text-white hover:bg-orange-400 dark:hover:bg-gray-700">
+              <button className="flex items-center">
+                <IoIosPeople style={iconStyle} />
+                <span className="ml-4">Sign Out</span>
+              </button>
+            </div>
           </ul>
         </div>
       </aside>

@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../../../utils/config';
 import Pagination from 'react-js-pagination';
 import Section from '@aio/components/Section';
-import { AiFillEdit, AiOutlineSearch } from 'react-icons/ai';
-import Spinner from '../../components/Spinner'; 
+import { AiOutlineSearch } from 'react-icons/ai';
+import { GrView } from 'react-icons/gr';
+import Spinner from '../../components/Spinner';
 import ModalDonation from './add-donation/ModalDonation';
+import ModalViewDonation from './view-donation/modalviewdonation';
 
 const Donation = () => {
   const [donationData, setDonationData] = useState([]);
@@ -15,28 +17,34 @@ const Donation = () => {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalViewOpen, setModalViewOpen] = useState(false);
+  const [paginationData, setPaginationData] = useState(false);
 
   const openModal = () => setModalOpen(true);
+  const openViewModal = () => setModalViewOpen(true);
   const closeModal = () => setModalOpen(false);
+  const closeViewModal = () => setModalViewOpen(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const parseToken = JSON.parse(token) || {};
     setIsLoading(true);
-    
+
     const fetchData = async () => {
-      const response = await fetch(`${API_BASE_URL}/donation/getallDonation?page=${activePage}&size=${size}&search=${search}`, {
+      const response = await fetch(`${API_BASE_URL}/donationDetail/getAllDonations?page=${activePage}&size=${size}&search=${search}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${parseToken}`,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setData(data.data);
-        setDonationData(data.data.data);
+        setDonationData(data.data);
+        setPaginationData(data.data.pagination);
+        console.log("donationData", donationData)
         setIsLoading(false);
       } else {
         const data = await response.json();
@@ -45,7 +53,7 @@ const Donation = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchData();
   }, [activePage, search]);
 
@@ -53,8 +61,10 @@ const Donation = () => {
     setActivePage(pageNumber);
   };
 
+  const [donationId, setDonationId] = useState("")
+
   return (
-    <div className="donarPage">
+    <div className="donarPage ">
       {isLoading && <Spinner />}
       <div className="donarDetailMainPage">
         <Section>
@@ -75,36 +85,47 @@ const Donation = () => {
             </div>
             {/* Add Donar Button */}
             <div>
-              <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add mandir user</button>
+              <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add Donation</button>
             </div>
 
             <Link href='/donation/add-outside-donation'>
-                <button className="btn btn-secondary">
-                  Add Outsider Donation
-                </button>
-              </Link>
+              <button className="btn btn-secondary">
+                Add Outsider Donation
+              </button>
+            </Link>
           </div>
         </Section>
 
         <Section>
-        <div className="overflow-x-auto">
+          <div className="overflow-x-auto">
             <table className="min-w-full text-left border border-gray-300">
               <thead className="bg-gray-100">
                 <tr>
                   <th className="w-48 py-2 px-4 text-nowrap border-b">Payment Type</th>
-                  <th className="py-2 px-4 border">Donation Amount</th>
+                  <th className="py-2 px-4 border">Receipt No.</th>
+                  <th className="py-2 px-4 border">Name</th>
+                  <th className="py-2 px-4 border">Address</th>
+                  <th className="py-2 px-4 border">Amount</th>
+                  <th className="py-2 px-4 border">Mobile</th>
                   <th className="py-2 px-4 border-b">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {donationData.map((donation, index) => (
+                {donationData?.donations?.map((donation, index) => (
                   <tr key={index} className="hover:bg-gray-100">
-                    <td className="py-2 px-4 border-b">{donation.donationMode}</td>
-                    <td className="py-2 px-4 border">{donation.donationAmount}</td>
+                    <td className="py-2 px-4 border-b">{donation.paymentType}</td>
+                    <td className="py-2 px-4 border">{donation.receiptNo}</td>
+                    <td className="py-2 px-4 border">{donation.fullname}</td>
+                    <td className="py-2 px-4 border">{donation.address}</td>
+                    <td className="py-2 px-4 border">{donation.totalAmount}</td>
+                    <td className="py-2 px-4 border">{donation.mobile}</td>
                     <td className="py-2 px-4 border-b">
-                      <Link href={`/donation/${donation._id}`}>
-                        <AiFillEdit className='text-red-600 cursor-pointer' />
-                      </Link>
+                      <button onClick={() => {
+                        setDonationId(donation._id);
+                        openViewModal();
+                      }}>
+                        <GrView className='text-red-600 cursor-pointer' />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -115,8 +136,8 @@ const Donation = () => {
             <Pagination
               activePage={activePage}
               itemsCountPerPage={size}
-              totalItemsCount={Data?.totalDocuments}
-              pageRangeDisplayed={5}
+              totalItemsCount={paginationData?.total}
+              pageRangeDisplayed={paginationData?.limit}
               onChange={handlePageChange}
               itemClass="page-item"
               linkClass="page-link"
@@ -125,6 +146,7 @@ const Donation = () => {
         </Section>
       </div>
       <ModalDonation isOpen={isModalOpen} onClose={closeModal} />
+      <ModalViewDonation isOpen={isModalViewOpen} onClose={closeViewModal} donationId={donationId} />
     </div>
   );
 };

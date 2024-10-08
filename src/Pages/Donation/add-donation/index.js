@@ -1,645 +1,608 @@
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { API_BASE_URL } from "../../../../utils/config";
-import { Multiselect } from "multiselect-react-dropdown";
-import Select from "react-select";
-import React from "react";
-import { ToastContainer, toast } from "react-toastify";
-import Section from "@aio/components/Section";
-import styles from "../donation.module.css";
+import Section from '@aio/components/Section';
+import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Spinner from '../../../components/Spinner'; 
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-// import Table from 'react-bootstrap/Table';
+import Spinner from 'src/components/Spinner';
+import { API_BASE_URL } from 'utils/config';
+import { FaPlusSquare } from "react-icons/fa";
 
-export default function AddDonation() {
-  const [donarData, setDonorData] = useState([]);
-  const [eventData, setEventData] = useState([]);
-  const [dailyEventData, setDailyEventData] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [eventCategoryId, setEventCategoryId] = useState(null);
-  const [donarId, setDonarId] = useState("");
-  const [show, setShow] = useState(false);
-
-  const [eventId, setEventId] = useState(null);
-  // const [eventCategoryId, setEvent] = useState("");
-  const [donationMode, setDonationMode] = useState("");
-  const [donationStatus, setDonationStatus] = useState("");
-  const [EventName, setEventName] = useState("");
-  const [donationDetail, setDonationDetail] = useState("");
-  const [donationAccNumber, setDonationAccNumber] = useState("");
-  const [donateToAccNumber, setDonationtoAccNumber] = useState("");
-  const [receiptName, setReceiptName] = useState("");
-  const [donationAmount, setDonationAmount] = useState("");
-  const [donationDate, setDonationDate] = useState(new Date());
-  const [isEventSelected, setIsEventSelected] = useState(false);
-  const [isEventCategorySelected, setIsEventCategorySelected] = useState(false);
-  const [selectedEventCategoryAmounts, setSelectedEventCategoryAmounts] = useState({}); 
-  const [selectedAmounts, setSelectedAmounts] = useState({}); 
+const AddDonation = () => {
+  const [paymentType, setPaymentType] = useState('cash');
+  const [formData, setFormData] = useState({
+    fullname: '',
+    mobile: '',
+    address: '',
+    remark: '',
+    donation: [],
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [pdfurl, setPdfUrl] = useState('');
-
-  const existingEventCategory = [
-    { _id: "option1", name: "Option 1" },
-    { _id: "option2", name: "Option 2" },
-    { _id: "option3", name: "Option 3" },
-  ];
-  const donationModeOptions = [
-    { value: "Cheque", label: "Cheque" },
-    { value: "Online", label: "Online" },
-    { value: "Cash", label: "Cash" },
-  ];
-  const donationStatusOptions = [
-    { value: "Pending", label: "Pending" },
-    { value: "Complete", label: "Complete" },
-  ];
-  const [selectedValues, setSelectedValues] = useState([]);
-  const [eventCategoryValues, setEventCategoryValues] = useState([]);
-
-  const router = useRouter();
-  const [error, setError] = useState("");
-
-  const handleClose = () => {
-    setShow(false)
-   router.push("/donation");
-
-  };
-  const dailyDonationSelected = () => {
-    setIsEventSelected(false)
-    setIsEventCategorySelected(false)
-    setEventId(null)
-    setEventCategoryId(null)
-
-  }
-  const handleAmountChange = (categoryId, value) => {
-    setSelectedAmounts((prevAmounts) => ({
-      ...prevAmounts,
-      [categoryId]: value,
-    }));
-  };
-  
-  const handleEventCategoryAmountChange = (categoryId, value) => {
-    setSelectedEventCategoryAmounts((prevAmounts) => ({
-      ...prevAmounts,
-      [categoryId]: value,
-    }));
-  };
-  
+  const [donationTypes, setDonationTypes] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
-    const fetchData = async () => {
-      const response = await fetch(`${API_BASE_URL}/donor/getalldonor`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${parseToken}`,
-        },
-        body: JSON.stringify(),
-      });
-
-      if (response.ok) {
+    const fetchDonationTypes = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/donationDetail/getAllDonationTypes`);
         const data = await response.json();
-        setDonorData(data.data.data);
-      } else {
-        const data = await response.json();
-        console.error(data.errorMessage);
-        alert(data.errorMessage);
-      }
-    };
-    fetchData();
-  }, []);
-  const [size, setsize] = useState(15);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
-
-    const fetchData = async () => {
-      const response = await fetch(`${API_BASE_URL}/event/getallevent?size=${size}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${parseToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setEventData(data.data);
-      } else {
-        const data = await response.json();
-        console.error(data.errorMessage);
-        alert(data.errorMessage);
-      }
-    };
-    const fetchDailyEventsData = async () => {
-      const response = await fetch(`${API_BASE_URL}/dailyEvent/getAllDailyCategory`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${parseToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setDailyEventData(data.data);
-        console.log('data',data)
-      } else {
-        const data = await response.json();
-        console.error(data.errorMessage);
-        alert(data.errorMessage);
+        setDonationTypes(data.data.data);
+        console.log(donationTypes)
+      } catch (error) {
+        console.error('Error fetching donation types:', error);
       }
     };
 
-    fetchData();
-    fetchDailyEventsData();
+    fetchDonationTypes();
   }, []);
 
-  const handleDateChange = (date) => {
-    setStartDate(date);
-    if (date instanceof Date && !isNaN(date)) {
-      setError("");
-    } else {
-      setError("Invalid date format. Please enter a valid date.");
-    }
-  };
-  const handledonationDate = (date) => {
-    setDonationDate(date);
-    if (date instanceof Date && !isNaN(date)) {
-      setError("");
-    } else {
-      setError("Invalid date format. Please enter a valid date.");
-    }
-  };
-  const onSelect = (selectedList, selectedItem) => {
-    setSelectedValues(selectedList);
-  };
-  
-  const onRemove = (selectedList, removedItem) => {
-    setSelectedValues(selectedList);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const oneventCategorySelect = (selectedList, selectedItem) => {
-    setEventCategoryValues(selectedList);
-    setIsEventCategorySelected(true)
-
+  const handlePaymentTypeChange = (e) => {
+    setPaymentType(e);
+    setFormData((prev) => ({
+      ...prev,
+      donation: [],
+    }));
   };
 
-  const oneventCategoryRemove = (selectedList, removedItem) => {
-    setEventCategoryValues(selectedList);
-    setIsEventCategorySelected(false)
+  const handlePaymentChange = (index, e) => {
+    const { name, value } = e.target;
+    const newPayments = [...formData.donation];
 
-  };
-  const handleEventChange = (selectedOption) => {
-    setSelectedEvent(selectedOption);
-    if (selectedOption) {
-      const event = eventData.data.find(
-        (event) => event._id === selectedOption.value._id
-      );
-      if (event) {
-        setEventId(event._id); // Set eventId
-        setEventName(event.eventName); // Set EventName (optional)
-        setEventCategoryId(null); // Reset event category when event changes
-      }
-    }
-  };
-  const customYearDropdown = ({ year, onChange }) => {
-    const yearOptions = [];
-    const startYear = year - 20; // Show 20 years before the selected year
-
-    for (let i = 0; i < 40; i++) {
-      // Show 40 years in the dropdown (20 years before and after the selected year)
-      yearOptions.push(
-        <option key={startYear + i} value={startYear + i}>
-          {startYear + i}
-        </option>
-      );
-    }
-  };
-
-
-
-  const addEvent = () => {
-    const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
-    const dailyEvent = [];
-    const eventCategory = [];
-    if (!isEventSelected) {
-      setEventCategoryId(null)
-      setEventId(null)
-      selectedValues.forEach((category) => {
-        dailyEvent.push({
-          dailyEventCategory: category.key,
-          donateEventAmount: selectedAmounts[category.key] || 0, 
-        });
-      });
-    }
-    if (isEventCategorySelected) {
-    
-      eventCategoryValues.forEach((category) => {
-        eventCategory.push({
-          eventCategoryId: category.value,
-          donateEventAmount: selectedEventCategoryAmounts[category.value] || 0, 
-        });
-      });
-    }
-    let calculatedDonationAmount = 0;
-    if (!isEventSelected) {
-      selectedValues.forEach((category) => {
-        calculatedDonationAmount += parseFloat(selectedAmounts[category.key]) || 0;
-      });
-    }
-    else if (isEventCategorySelected) {
-      console.log('isEventCategorySelected',isEventCategorySelected)
-      eventCategoryValues.forEach((category) => {
-        calculatedDonationAmount += parseFloat(selectedEventCategoryAmounts[category.value]) || 0;
-      });
-      console.log('calculatedDonationAmount',calculatedDonationAmount)
-    }
-     else {
-      calculatedDonationAmount = parseFloat(donationAmount) || 0;
-    }
-    const inputData = {
-      eventId,
-      // eventCategory,
-      donationMode,
-      donationStatus,
-      donationDate,
-      donationAmount:calculatedDonationAmount,
-      donationAccNumber,
-      donateToAccNumber,
-      receiptName,
-      donationDetail,
-      dailyEvent
+    newPayments[index] = {
+      ...newPayments[index],
+      [name]: value // This should store the ID correctly
     };
-console.log(inputData)
-    // Log the input values object
+
+    setFormData({ ...formData, donation: newPayments });
+
+    // Optionally update total amount
+    const totalAmount = newPayments.reduce((total, payment) => total + Number(payment.amount || 0), 0);
+    setFormData((prev) => ({ ...prev, amount: totalAmount }));
+  };
+
+
+  const handleRemovePayment = (index) => {
+    const newPayments = formData.donation.filter((_, i) => i !== index);
+    setFormData({ ...formData, donation: newPayments });
+  };
+
+  const handleAddPayment = () => {
+    setFormData((prev) => ({
+      ...prev,
+      donation: [...prev.donation, { bankName: '', transactionNo: '', chequeNo: '', chequeDate: '', cardNumber: '', expiryDate: '', typeOfDonation: '', amount: 0, remark: '', donationItem: '', size: '', units: '', itemType: '', quantity: '' }],
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setIsLoading(true);
-    
-    const fetchData = async () => {
-      const response = await fetch(
-        `${API_BASE_URL}/donation/addDonation/${donarId._id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${parseToken}`,
-          },
-          body: JSON.stringify(inputData),
-        }
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('addDonRes',data)
-         let donationId = data.data._id
-          fetchpdfUrl(donationId)
-          toast.success("Add successfully", {
-            position: toast.POSITION.TOP_RIGHT,
-          });
-          // router.push("/donation");
-          setIsLoading(false);
-        } else {
-          const data = await response.json();
-          toast.error(data.errorMessage, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
-          setIsLoading(false);
+    try {
+      const donations = formData.donation
+        .map(payment => ({
+          typeofdonation: payment.typeOfDonation || null,
+          amount: Number(payment.amount),
+          remark: payment.remark || null,
+          bankName: payment.bankName || null,
+          transactionNo: payment.transactionNo || null,
+          chequeNo: payment.chequeNo || null,
+          chequeDate: payment.chequeDate || null,
+          donationItem: payment.donationItem || null,
+          size: payment.size || null,
+          units: payment.units || null,
+          itemType: payment.itemType || null,
+          quantity: payment.quantity || null
+        }))
+        .filter(donation => donation.amount > 0); // Ensure amount is greater than 
+      console.log(donations)
+      if (donations.length === 0) {
+        toast.error('Please add at least one valid donation.');
+        return;
       }
-    };
-    const fetchpdfUrl = async (donationI) => {
-      const response = await fetch(
-        `${API_BASE_URL}/donation/downloadPdf/${donationI}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${parseToken}`,
-          },
-          body: JSON.stringify(),
-        }
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          const pdfUrl = data.url; // Replace with your PDF URL
-          setPdfUrl(pdfUrl)
-          setShow(true)
-            
-        } else {
-          const data = await response.json();
-          toast.error(data.errorMessage, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
-          setIsLoading(false);
-        }    
-        
-    };
-    fetchData();
+
+      const submissionData = {
+        paymentType,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString(),
+        mobile: formData.mobile,
+        fullname: formData.fullname,
+        address: formData.address,
+        donations,
+      };
+
+      console.log('Submission Data:', submissionData);
+
+      // Retrieve token (this example assumes it's in local storage)
+      const token = Cookies.get('token');
+
+      const response = await fetch(`${API_BASE_URL}/donationDetail/createDonation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Add the token here
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Network response was not ok');
+      }
+
+      const result = await response.json();
+      toast.success('Donation submitted successfully!');
+      window.location.reload();
+
+      setFormData({
+        fullname: '',
+        mobile: '',
+        address: '',
+        donation: [],
+      });
+
+    } catch (error) {
+      toast.error('Error submitting donation: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const [currentDate, setCurrentDate] = useState('');
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    // Set the current date in the desired format
+    setCurrentDate(new Date().toISOString().split('T')[0]);
+    setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  }, []);
+
+  const donationItems = [
+    { id: 1, itemType_en: "GOLD STOCK DONATION", itemType_hi: "स्वर्ण उपहार दान खाते जमा ", status: 1 },
+    { id: 2, itemType_en: "SILVER STOCK DONATION", itemType_hi: "चांदी उपहार दान खाते जमा ", status: 1 },
+    { id: 3, itemType_en: "GIFT ITEM DONATION", itemType_hi: "उपहार दान खाते जमा ", status: 1 }
+  ];
+
+  const [isHindi, setIsHindi] = useState(false);
+  const toggleLanguage = () => {
+    setIsHindi(!isHindi); // Toggle between Hindi and English
+  };
+
+  const headings = {
+    cash: isHindi ? "नकद भुगतान विवरण" : "Cash Payment Details",
+    cheque: isHindi ? "चेक भुगतान विवरण" : "Cheque Payment Details",
+    electronic: isHindi ? "इलेक्ट्रॉनिक भुगतान विवरण" : "Electronic Payment Details",
+    item: isHindi ? "आइटम विवरण" : "Item Details",
+    totalAmount: isHindi ? "कुल राशि" : "Total Amount",
+    amount: isHindi ? "राशि" : "Amount",
+    submit: isHindi ? "दान सबमिट करें" : "Submit Donation",
+    date: isHindi ? "तारीख:" : "Date:",
+    time: isHindi ? "समय:" : "Time:",
+    mobile: isHindi ? "मोबाइल:" : "Mobile:",
+    fullName: isHindi ? "पूरा नाम:" : "Full Name:",
+    address: isHindi ? "पता:" : "Address:",
+    bankName: isHindi ? "बैंक नाम:" : "Bank Name:",
+    transactionNo: isHindi ? "लेनदेन संख्या:" : "Transaction No:",
+    chequeNo: isHindi ? "चेक संख्या:" : "Cheque No:",
+    chequeDate: isHindi ? "चेक तिथि:" : "Cheque Date:",
+    itemType: isHindi ? "आइटम प्रकार:" : "Item Type:",
+    size: isHindi ? "आकार:" : "Size:",
+    units: isHindi ? "इकाइयाँ:" : "Units:",
+    quantity: isHindi ? "मात्रा:" : "Quantity:",
+    approxValue: isHindi ? "अनुमानित मूल्य:" : "Approx. Value:",
+    remove: isHindi ? "हटाएं" : "Remove",
+    typeDonaion : isHindi ? "दान के कई प्रकार" : "Type Of Donation",
+    remark : isHindi ? "टिप्पणी" : "Remark",
+    action : isHindi ? "कार्रवाई" : "Actions"
+  };
+
 
   return (
     <Section>
-       {isLoading &&    <Spinner/>  }
-    <div className="donarPage">
+      {isLoading && <Spinner />}
       <ToastContainer position="top-right" autoClose={5000} />
-
-      <div className="addDonarForm">
-        <h2 className={`${styles.formHeaderext}`}>Enter donation&apos;s details</h2>
-        <form>
-            <div className="formMainDiv">
-            <div className="label-form eventInp donationDrop">
-              <label htmlFor="eventId">Donor</label>
-              <br />
-              <Select 
-              className="selectDropdown"
-                options={donarData.map((donor) => ({
-                  value: donor._id,
-                  label: donor.firstName, // Show donor's first name
-                }))}
-                name="donorId"
-                id="donorId"
-                onChange={(selectedOption) => {
-                  if (selectedOption) {
-                    const selectedDonor = donarData.find(
-                      (donor) => donor._id === selectedOption.value
-                    );
-                    setDonarId(selectedDonor);
-                  }
-                }}
-              />
-            </div>
-            <div className="label-form donationTypeInput">
-            <p className="formLabel">Donation type</p>
-            <div className="d-flex">
-
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="flexRadioDefault"
-                id="flexRadioDefault1"
-                onChange={() => setIsEventSelected(true)}
-
-              />
-              <label className="form-check-label" for="flexRadioDefault1">
-                Event
-              </label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="flexRadioDefault"
-                id="flexRadioDefault2"
-                checked={!isEventSelected}
-              // onChange={() => setIsEventSelected(false)}
-              onChange={dailyDonationSelected}
-              />
-              <label className="form-check-label" htmlFor="flexRadioDefault2">
-                Daily donation
-              </label>
-            </div>
-            </div>
-            </div>
-        
-          {!isEventSelected && (
-          <div className="label-form eventInp donationDrop">
-            <label htmlFor="Event category">Daily events</label>
-            <br />
-            <Multiselect
-            options={dailyEventData.map(category => ({ key: category._id, value: category.name }))}
-            placeholder=""
-           displayValue="value" // Options to display in the dropdown
-           onSelect={onSelect}
-           onRemove={onRemove}
-         />
-       </div>
-          )}
-            {!isEventSelected && selectedValues.length > 0 && (
-                <>
-                {selectedValues.map((category) => (
-                    <div key={category.key} className="label-form eventInp">
-                <div  className=" donationCategoryAmounts">
-                  <label htmlFor={`donationAmount_${category.key}`}>
-                    Donation Amount for {category.value}
-                  </label>
-                  <br />
-                  <input
-                    type="number"
-                    id={`donationAmount_${category.key}`}
-                    value={selectedAmounts[category.key] || ""}
-                    onChange={(e) =>
-                      handleAmountChange(category.key, e.target.value)
-                    }
-                  />
-                </div>
-                </div>
-              ))}
-              </>
-          )}
-          {isEventSelected && (
-            <div className="label-form eventInp donationDrop">
-              <label htmlFor="eventId">Event</label>
-              <br />
-              <Select
-                options={eventData.data.map((event) => ({
-                  value: event,
-                  label: event.eventName,
-                }))}
-                name="eventId"
-                id="eventId"
-                onChange={handleEventChange}
-              />
-            </div>
-          )}
-            {isEventSelected && selectedEvent && selectedEvent?.value?.eventCategory && (
-              <div className="label-form eventInp donationDrop">
-                <label htmlFor="eventCategoryId">Event category</label>
-                <br />
-                <Multiselect
-                  options={selectedEvent?.value?.eventCategory.map(
-                    (category) => ({
-                      value: category._id,
-                      label: category.name,
-                    })
-                  )}
-                  name="eventCategoryId"
-                  displayValue="label"
-                  classNamePrefix="Select"
-                  id="eventCategoryId"
-                  // onChange={(selectedOption) => {
-                  //   if (selectedOption) {
-                  //     setEventCategoryId(selectedOption.value);
-                  //   }
-                  // }}
-                  onSelect={oneventCategorySelect}
-                  onRemove={oneventCategoryRemove}
-                />
-              </div>
-            )}
-            {isEventCategorySelected && eventCategoryValues.length > 0 && (
-                <>
-                {eventCategoryValues.map((category) => (
-                    <div key={category.value} className="label-form eventInp">
-                <div  className=" donationCategoryAmounts">
-                  <label htmlFor={`donationAmount_${category.value}`}>
-                    Donation Amount for {category.label}
-                  </label>
-                  <br />
-                  <input
-                    type="number"
-                    id={`donationAmount_${category.value}`}
-                    value={selectedEventCategoryAmounts[category.value] || ""}
-                    onChange={(e) =>
-                      handleEventCategoryAmountChange(category.value, e.target.value)
-                    }
-                  />
-                </div>
-                </div>
-              ))}
-              </>
-          )}
-         
-
-            <div className="label-form eventInp donationDrop">
-              <label htmlFor="ddonationMode">Payment type</label>
-              <br />
-              <Select
-                options={donationModeOptions}
-                name="ddonationMode"
-                classNamePrefix="Select"
-                id="ddonationMode"
-                onChange={(selectedOption) => {
-                  if (selectedOption) {
-                    setDonationMode(selectedOption.value);
-                  }
-                }}
-              />
-            </div>
-            <div className="label-form eventInp donationDrop">
-              <label htmlFor="donationStatus">Donation Status</label>
-              <br />
-              <Select
-                options={donationStatusOptions}
-                name="donationStatus"
-                classNamePrefix="Select"
-                id="donationStatus"
-                onChange={(selectedOption) => {
-                  if (selectedOption) {
-                    setDonationStatus(selectedOption.value);
-                  }
-                }}
-              />
-            </div>
-          
-            <div className="label-form eventInp">
-              <label htmlFor="donationDate">Donation Date</label>
-              <br />
-              <DatePicker
-                showYearDropdown
-                yearDropdownItemNumber={100}
-                scrollableYearDropdown
-                selected={donationDate}
-                onChange={handledonationDate}
-                dateFormat="MM/dd/yyyy"
-              />
-            </div>
-            {isEventSelected && (
-            <div className="label-form eventInp">
-              <label htmlFor="donationAmount">Donation Amount</label>
-              <br />
-              <input
-                type="number"
-                id="donationAmount"
-                value={donationAmount}
-                onChange={(e) => setDonationAmount(e.target.value)}
-              />
-            </div>
-            )}
-          
-            <div className="label-form eventInp">
-              <label htmlFor="donationAccNumber">Donation Acc Number</label>
-              <br />
-              <input
-                type="text"
-                id="donationAccNumber"
-                value={donationAccNumber}
-                onChange={(e) => setDonationAccNumber(e.target.value)}
-              />
-            </div>
-            <div className="label-form eventInp">
-              <label htmlFor="donateToAccNumber">Donation to Acc Number</label>
-              <br />
-              <input
-                type="text"
-                id="donateToAccNumber"
-                value={donateToAccNumber}
-                onChange={(e) => setDonationtoAccNumber(e.target.value)}
-              />
-            </div>
-            <div className="label-form eventInp">
-              <label htmlFor="receiptName">Receipt name</label>
-              <br />
-              <input
-                type="text"
-                id="receiptName"
-                value={receiptName}
-                onChange={(e) => setReceiptName(e.target.value)}
-              />
-            </div>
-        
-          <div className="label-form ">
-            <label htmlFor="donationDetail">Donation Detail</label>
-            <br />
-            <textarea
-              className="textareaEvent"
-              type="text"
-              id="donationDetail"
-              value={donationDetail}
-              onChange={(e) => setDonationDetail(e.target.value)}
-            />
-          </div>
-          </div>
-          <div className="d-flex">
-            <div className="submitEvent addDonarSubmitBtnMain">
-              <button
-                className="addDonarSubmitBtn"
-                type="button"
-                onClick={addEvent}
-              >
-                Submit
-              </button>
-            </div>
-            <div className="nextDonarSubmitBtnMain"></div>
-          </div>
-        </form>
+      <button onClick={toggleLanguage} className="p-2 bg-blue-500 text-white rounded">
+        {isHindi ? "Switch to English" : "हिंदी में स्विच करें"}
+      </button>
+      <div className="flex space-x-4 ml-6 border-gray-300">
+        {['cash', 'cheque', 'electronic', 'item'].map((type) => (
+          <button
+            key={type}
+            onClick={() => handlePaymentTypeChange(type)}
+            className={`py-2 px-4 rounded-lg transition-colors ${paymentType === type
+              ? 'bg-orange-400 text-white'
+              : 'text-gray-500 bg-gray-100 hover:bg-orange-400 hover:text-white'
+              }`}
+          >
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </button>
+        ))}
       </div>
-      
-    </div>
-    <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>PDF</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-              Do you want to open pdf?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" >
-            <a href={pdfurl} target="_blank" rel="noreferrer">OpenPDf</a>
-          </Button>
-        </Modal.Footer>
-      </Modal>
+
+      <form onSubmit={handleSubmit} className="space-y-2 p-4 bg-white ">
+        <div className='grid md:grid-cols-3 gap-4'>
+          <label className="block">
+          {headings.date}
+            <input type="text" name="address" value={currentDate} disabled className="input mt-1 border border-gray-300 rounded p-2 w-full" />
+          </label>
+          <label className="block">
+          {headings.time}
+            <input type="text" name="address" value={currentTime} disabled className="input mt-1 border border-gray-300 rounded p-2 w-full" />
+          </label>
+          <label className="block">
+          {headings.mobile}
+            <input type="text" name="mobile" value={formData.mobile} onChange={handleChange} required className="input mt-1 border border-gray-300 rounded p-2 w-full" />
+          </label>
+          <label className="block">
+          {headings.fullName}
+            <input type="text" name="fullname" value={formData.fullname} onChange={handleChange} required className="input mt-1 border border-gray-300 rounded p-2 w-full" />
+          </label>
+          <label className="block">
+          {headings.address}
+            <input type="text" name="address" value={formData.address} onChange={handleChange} required className="input mt-1 border border-gray-300 rounded p-2 w-full" />
+          </label>
+        </div>
+
+        {/* Payments Table */}
+        <div>
+          {paymentType === 'cash' && (
+            <>
+              <h3 className="text-lg font-semibold mt-4">{headings.cash}</h3>
+              <table className="w-full border-collapse border border-gray-300 mt-2">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-300 p-2 flex justify-between items-center">{headings.typeDonaion}<span onClick={handleAddPayment}><FaPlusSquare className="text-blue-500 text-3xl" /></span></th>
+                    <th className="border border-gray-300 p-2">{headings.amount}</th>
+                    <th className="border border-gray-300 p-2">{headings.remark}</th>
+                    <th className="border border-gray-300 p-2">{headings.action}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.donation.map((payment, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 p-2">
+                        <select
+                          name="typeOfDonation"
+                          value={payment.typeOfDonation || ''} // Ensure it initializes properly
+                          onChange={(e) => handlePaymentChange(index, e)} // Pass the event directly
+                          className="border rounded-md p-1 w-full"
+                        >
+                          <option value="" disabled>Select Donation Type</option>
+                          {donationTypes.map((type) => (
+                            <option key={type._id} value={type._id}>{type.nameHindi}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="number"
+                          name="amount"
+                          value={payment.amount}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="remark"
+                          value={payment.remark}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePayment(index)}
+                          className="bg-red-500 text-white rounded-md px-2 py-1"
+                        >
+                          {headings.remove}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="font-semibold">
+                    <td className="border border-gray-300 p-2">{headings.totalAmount}</td>
+                    <td className="border border-gray-300 p-2">
+                      ₹ {formData.donation.reduce((total, payment) => total + Number(payment.amount || 0), 0).toFixed(2)}
+                    </td>
+                    <td className="border border-gray-300 p-2"></td>
+                    <td className="border border-gray-300 p-2"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </>
+          )}
+
+          {paymentType === 'cheque' && (
+            <>
+              <h3 className="text-lg font-semibold mt-4">{headings.cheque}</h3>
+              <table className="w-full border-collapse border border-gray-300 mt-2">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-300 p-2 flex justify-between items-center text-nowrap">{headings.typeDonaion}<span onClick={handleAddPayment}><FaPlusSquare className="text-blue-500 text-3xl" /></span></th>
+                    <th className="border border-gray-300 p-2 text-nowrap">{headings.amount}</th>
+                    <th className="border border-gray-300 p-2 text-nowrap">{headings.remark}</th>
+                    <th className="border border-gray-300 p-2 text-nowrap">{headings.bankName}</th>
+                    <th className="border border-gray-300 p-2 text-nowrap">{headings.transactionNo}</th>
+                    <th className="border border-gray-300 p-2 text-nowrap">{headings.chequeNo}</th>
+                    <th className="border border-gray-300 p-2 text-nowrap">{headings.chequeDate}</th>
+                    <th className="border border-gray-300 p-2 text-nowrap">{headings.action}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.donation.map((payment, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 p-2">
+                        <select
+                          name="typeOfDonation"
+                          value={payment.typeOfDonation || ''} // Ensure it initializes properly
+                          onChange={(e) => handlePaymentChange(index, e)} // Pass the event directly
+                          className="border rounded-md p-1 w-full"
+                        >
+                          <option value="" disabled>Select Donation Type</option>
+                          {donationTypes.map((type) => (
+                            <option key={type._id} value={type._id}>{type.nameHindi}</option>
+                          ))}
+                        </select>
+                      </td>
+
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="number"
+                          name="amount"
+                          value={payment.amount}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="remark"
+                          value={payment.remark}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="bankName"
+                          value={payment.bankName}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="transactionNo"
+                          value={payment.transactionNo}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="chequeNo"
+                          value={payment.chequeNo}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="date"
+                          name="chequeDate"
+                          value={payment.chequeDate}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <button type="button" onClick={() => handleRemovePayment(index)} className="text-red-500">{headings.remove}</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
+
+          {paymentType === 'electronic' && (
+            <>
+              <h3 className="text-lg font-semibold mt-4">{headings.electronic}</h3>
+              <table className="w-full border-collapse border border-gray-300 mt-2">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-300 p-2 flex justify-between items-center text-nowrap">{headings.typeDonaion}<span onClick={handleAddPayment}><FaPlusSquare className="text-blue-500 text-3xl" /></span></th>
+                    <th className="border border-gray-300 p-2">{headings.amount}</th>
+                    <th className="border border-gray-300 p-2">{headings.bankName}</th>
+                    <th className="border border-gray-300 p-2">{headings.transactionNo}</th>
+                    <th className="border border-gray-300 p-2">{headings.remark}</th>
+                    <th className="border border-gray-300 p-2">{headings.action}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.donation.map((payment, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 p-2">
+                        <select
+                          name="typeOfDonation"
+                          value={payment.typeOfDonation || ''} // Ensure it initializes properly
+                          onChange={(e) => handlePaymentChange(index, e)} // Pass the event directly
+                          className="border rounded-md p-1 w-full"
+                        >
+                          <option value="" disabled>Select Donation Type</option>
+                          {donationTypes.map((type) => (
+                            <option key={type._id} value={type._id}>{type.nameHindi}</option>
+                          ))}
+                        </select>
+                      </td>
+
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="number"
+                          name="amount"
+                          value={payment.amount}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="bankName"
+                          value={payment.bankName}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="transactionNo"
+                          value={payment.transactionNo}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="remark"
+                          value={payment.remark}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <button type="button" onClick={() => handleRemovePayment(index)} className="text-red-500">{headings.remove}</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
+
+          {paymentType === 'item' && (
+            <>
+              <h3 className="text-lg font-semibold mt-4">{headings.item}</h3>
+              <table className="w-full border-collapse border border-gray-300 mt-2">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-300 p-2 flex justify-between items-center text-nowrap">Donation Item<span onClick={handleAddPayment}><FaPlusSquare className="text-blue-500 text-3xl" /></span></th>
+                    <th className="border border-gray-300 p-2">{headings.itemType}</th>
+                    <th className="border border-gray-300 p-2">{headings.size}</th>
+                    <th className="border border-gray-300 p-2">{headings.units}</th>
+                    <th className="border border-gray-300 p-2">{headings.quantity}</th>
+                    <th className="border border-gray-300 p-2">{headings.approxValue}</th>
+                    <th className="border border-gray-300 p-2">{headings.remark}</th>
+                    <th className="border border-gray-300 p-2">{headings.action}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.donation.map((payment, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 p-2">
+                        <select
+                          name="donationItem"
+                          value={payment.donationItem || ''}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        >
+                          <option value="" disabled>Select Donation Item</option>
+                          {donationItems.map((type) => (
+                            <option key={type.id} value={type.itemType_hi}>
+                              {type.itemType_hi}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="itemType"
+                          value={payment.itemType}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="number"
+                          name="size"
+                          value={payment.size}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <select
+                          name="units"
+                          value={payment.units}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        >
+                          <option value="" disabled>Select Unit</option>
+                          <option value="G">G</option>
+                          <option value="KG">KG</option>
+                          <option value="MG">MG</option>
+                          <option value="UG">UG</option>
+                        </select>
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="quantity"
+                          value={payment.quantity}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="amount"
+                          value={payment.amount}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <input
+                          type="text"
+                          name="remark"
+                          value={payment.remark}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="border rounded-md p-1 w-full"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <button type="button" onClick={() => handleRemovePayment(index)} className="text-red-500">{headings.remove}</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <div>
+          <button type="submit" className="mt-4 p-2 bg-green-500 text-white rounded">{headings.submit}</button>
+        </div>
+      </form>
     </Section>
   );
-}
+};
+
+export default AddDonation;

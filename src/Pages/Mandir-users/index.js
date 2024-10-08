@@ -10,7 +10,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import Spinner from '../../components/Spinner';
 import { API_BASE_URL } from 'utils/config';
 import { AiOutlineSearch } from "react-icons/ai";
-import Modal from './add-mandir-users/modal';
+import Modal from './add-mandir-users/Modal';
+import ModalViewDonor from './view-mandir-users/ModalViewDonor';
+import ModalEditDonor from './update-mandir-users/ModalEditDonor';
 
 const MandirUsers = () => {
   const [donorData, setDonorData] = useState([]);
@@ -20,11 +22,24 @@ const MandirUsers = () => {
   const [search, setSearch] = useState('');
   const [isActive, setIsActive] = useState([]);
   const [donarId, setDonarId] = useState([]);
+  const [Id, setId] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
+
+
+
+  const [isModalViewOpen, setModalViewOpen] = useState(false);
+
+  const openViewModal = () => setModalViewOpen(true);
+  const closeViewModal = () => setModalViewOpen(false);
+
+  const [isModalEditOpen, setModalEditOpen] = useState(false);
+
+  const openEditModal = () => setModalEditOpen(true);
+  const closeEditModal = () => setModalEditOpen(false);
 
   const handleSwitchChange = (checked, index) => {
     const updatedIs_id = [...donarId];
@@ -98,13 +113,14 @@ const MandirUsers = () => {
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
   }
+  console.log(Id)
 
   return (
     <div className="p-4 md:p-8">
       {isLoading && <Spinner />}
       <ToastContainer position="top-right" autoClose={5000} />
 
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white p-4">
         <Section>
           <div className="mb-4">
             <h2 className="text-2xl font-bold">Mandir users</h2>
@@ -166,17 +182,23 @@ const MandirUsers = () => {
                       )}
                     </td>
                     <td className="px-6 py-3 flex items-center space-x-2">
-                      <Link href={`/mandir-users/${donor._id}`}>
+                      <button onClick={() => {
+                        setId(donor._id);
+                        openEditModal();
+                      }}>
                         <AiFillEdit className="text-red-600 hover:text-red-800" />
-                      </Link>
+                      </button>
                       <Switch
                         onChange={(checked) => handleSwitchChange(checked, index)}
                         checked={isActive[index]}
                         className="custom-switch"
                       />
-                      <Link href={`/mandir-users/view-mandir-user/${donor.user_detail || donor._id}`}>
-                        <GrView className="text-blue-600 hover:text-blue-800" />
-                      </Link>
+                      <button onClick={() => {
+                        setId(donor.user_detail || donor._id);
+                        openViewModal();
+                      }}>
+                        <GrView className='text-gray-600 cursor-pointer ml-2' />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -200,6 +222,8 @@ const MandirUsers = () => {
       </div>
       <Modal isOpen={isModalOpen} onClose={closeModal}>
       </Modal>
+      <ModalViewDonor isOpen={isModalViewOpen} onClose={closeViewModal} DonorId={Id} />
+      <ModalEditDonor isOpen={isModalEditOpen} onClose={closeEditModal} DonorId={Id} />
     </div>
   );
 };
