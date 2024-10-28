@@ -61,7 +61,7 @@ export default function UpdateMandirUsers({ DonorId }) {
     if (DonorId) {
       let jsonString = [];
       const token = localStorage.getItem('token');
-      const parseToken = JSON.parse(token) || {};
+      const parseToken = (token) || {};
       const fetchData = async () => {
         const response = await fetch(`${API_BASE_URL}/donor/getdonor/${DonorId}`, {
           method: 'GET',
@@ -230,7 +230,7 @@ export default function UpdateMandirUsers({ DonorId }) {
       setMember([])
     }
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     const fetchData = async () => {

@@ -95,7 +95,7 @@ export default function UpdateDonation() {
   useEffect(() => {
   
     const token = localStorage.getItem('token');
-            const parseToken = JSON.parse(token) || {};
+            const parseToken = (token) || {};
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/donor/getalldonor`, {
         method: 'GET',
@@ -123,7 +123,7 @@ export default function UpdateDonation() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/event/getallevent`, {
@@ -166,7 +166,7 @@ export default function UpdateDonation() {
   }, []);
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/event/getAllCategory`, {
@@ -265,7 +265,7 @@ export default function UpdateDonation() {
     if (slug.slug) {
     let jsonString = [];
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 const fetchData = async () => {
 const response = await fetch(`${API_BASE_URL}/donation/getdonation/${slug.slug}`, {
 method: 'GET',
@@ -377,7 +377,7 @@ fetchData();
  
 
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     const dailyEvent = [];
 
     if (!isEventSelected) {

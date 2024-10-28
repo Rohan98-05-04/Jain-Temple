@@ -150,7 +150,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/users/getDashboard`, {
         method: "GET",

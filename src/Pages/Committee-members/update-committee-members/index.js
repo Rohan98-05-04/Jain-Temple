@@ -43,7 +43,7 @@ export default function UpdateCommitteeMembers({ eventId, onSuccess }) {
     if (eventId) {
       const fetchData = async () => {
         const token = localStorage.getItem("token");
-        const parseToken = JSON.parse(token) || {};
+        const parseToken = (token) || {};
         setIsLoading(true);
 
         const response = await fetch(
@@ -92,7 +92,7 @@ export default function UpdateCommitteeMembers({ eventId, onSuccess }) {
 
   const handleSignup = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     const response = await fetch(

@@ -61,7 +61,7 @@ export default function UpdateEvent({ eventId, onSuccess }) {
     if (eventId) {
       let jsonString = [];
       const token = localStorage.getItem('token');
-      const parseToken = JSON.parse(token) || {};
+      const parseToken = (token) || {};
       const fetchData = async () => {
         const response = await fetch(`${API_BASE_URL}/event/getevent/${eventId}`, {
           method: 'GET',
@@ -104,7 +104,7 @@ export default function UpdateEvent({ eventId, onSuccess }) {
   useEffect(() => {
 
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/event/getAllCategory`, {
         method: 'GET',
@@ -151,7 +151,7 @@ export default function UpdateEvent({ eventId, onSuccess }) {
     }
 
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     const fetchData = async () => {

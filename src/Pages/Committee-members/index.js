@@ -36,7 +36,7 @@ const CommitteeMembers = () => {
 
   const fetchEvents = async () => {
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     const response = await fetch(`${API_BASE_URL}/users/allUser?page=${activePage}&size=${size}&search=${search}`, {

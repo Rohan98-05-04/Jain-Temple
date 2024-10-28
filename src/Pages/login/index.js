@@ -42,7 +42,7 @@ const Login = () => {
           if (response.ok) {
             
             const data = await response.json();
-            const jsonString = JSON.stringify(data.data.accessToken);
+            const jsonString = data.data.accessToken;
             
             Cookies.set("token", jsonString);
 

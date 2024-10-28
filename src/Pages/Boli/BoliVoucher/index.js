@@ -35,7 +35,7 @@ export default function BoliVoucher() {
 
     const fetchEvents = async () => {
         const token = localStorage.getItem('token');
-        const parseToken = JSON.parse(token) || {};
+        const parseToken = (token) || {};
         setIsLoading(true);
 
         const response = await fetch(`${API_BASE_URL}/boliDetail/getAllBolis?boliType=${"bolivoucher"}&page=${activePage}&size=${size}&search=${search}`, {
@@ -79,7 +79,7 @@ export default function BoliVoucher() {
 
     const handleDelete = async () => {
         const token = localStorage.getItem('token');
-        const parseToken = JSON.parse(token) || {};
+        const parseToken = (token) || {};
 
         setIsLoading(true);
         const response = await fetch(`${API_BASE_URL}/boliDetail/deleteBoliById/${Id}`, {

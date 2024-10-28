@@ -26,7 +26,7 @@ export default function AddEvent({ onSuccess }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       try {
@@ -99,7 +99,7 @@ export default function AddEvent({ onSuccess }) {
     }
 
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     try {
@@ -108,17 +108,12 @@ export default function AddEvent({ onSuccess }) {
       formData.append("eventDetail", eventDetail);
       formData.append("startDate", startDate.toISOString());
       formData.append("endDate", endDate.toISOString());
-
-      // Send eventCategory as a single JSON string
       formData.append("eventCategory", JSON.stringify(eventCategory));
 
       if (image) formData.append("image", image);
 
       const response = await fetch(`${API_BASE_URL}/event/addevent`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${parseToken}`,
-        },
         body: formData,
       });
 

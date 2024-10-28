@@ -30,7 +30,7 @@ export default function EventData() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchDailyEventData = async () => {
       setIsLoading(true);
