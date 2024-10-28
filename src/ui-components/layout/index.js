@@ -78,7 +78,7 @@ export function SidebarDemo() {
     },
   ];
 
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
   // return (
   //   <div className="flex flex-col bg-gray-100 dark:bg-neutral-800 border border-neutral-200 max-h-full dark:border-neutral-700">
