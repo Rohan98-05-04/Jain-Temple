@@ -1,65 +1,42 @@
 import { IoGridOutline, IoHomeOutline } from "react-icons/io5";
 import { BsSpeedometer2 } from "react-icons/bs";
-import { BiUserCircle } from "react-icons/bi";
-import { AiOutlineBarChart } from "react-icons/ai";
+import { GiExpense } from "react-icons/gi";
+import { FaDonate } from "react-icons/fa";
+import { MdOutlineEventNote } from "react-icons/md";
+import { IoIosPeople } from "react-icons/io";
+import { FaUserShield } from "react-icons/fa";
+
+const iconStyle = { fontSize: '24px' }; // Adjust size as needed
 
 export default [
-    // {
-    //     to: '/',
-    //     name: 'Home',
-    //     Icon: IoHomeOutline
-    // },
-    // {
-    //     to: '/profile',
-    //     name: 'Profile',
-    //     Icon: BiUserCircle
-    // },
     {
         to: '/dashboard',
         name: 'Dashboard',
-        Icon: BsSpeedometer2
+        Icon: (props) => <BsSpeedometer2 {...props} style={iconStyle} />
     },
     {
         to: '/mandir-users',
         name: 'Mandir users',
-        Icon: BsSpeedometer2
+        Icon: (props) => <FaUserShield {...props} style={iconStyle} />
     },
     {
         to: '/donation',
         name: 'Donation',
-        Icon: BsSpeedometer2
+        Icon: (props) => <FaDonate {...props} style={iconStyle} />
     },
     {
         to: '/expenses',
         name: 'Expenses',
-        Icon: BsSpeedometer2
+        Icon: (props) => <GiExpense {...props} style={iconStyle} />
     },
     {
         to: '/event',
         name: 'Event',
-        Icon: BsSpeedometer2
+        Icon: (props) => <MdOutlineEventNote {...props} style={iconStyle} />
     },
     {
         to: '/committee-members',
         name: 'Committee members',
-        Icon: BsSpeedometer2
+        Icon: (props) => <IoIosPeople {...props} style={iconStyle} />
     },
-    // {
-    //     to: '/test-components',
-    //     name: 'Test Components',
-
-    //     Icon: IoGridOutline
-    // },
-    // {
-    //     to: '/statistics',
-    //     name: 'Statistics',
-
-    //     Icon: AiOutlineBarChart
-    // },
-    // {
-    //     to: '/uiComponent',
-    //     name: 'uiComponent',
-
-    //     Icon: AiOutlineBarChart
-    // }
 ];

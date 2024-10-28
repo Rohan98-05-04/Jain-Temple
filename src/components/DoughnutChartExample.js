@@ -39,7 +39,7 @@ const DoughnutChartExample = (props) => {
 
   return (
     <div
-      class="chart-container"
+      className="chart-container"
       style={{
         position: "relative", 
         height: "200px", 

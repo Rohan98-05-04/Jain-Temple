@@ -1,4 +1,4 @@
-import AddEventCategories from "src/Pages/Event/add-event-category";
+import AddEventCategories from "src/Pages/Masters/EventCategory/addEventCategory";
 import Layout from "../../src/ui-components/layout";
 
 const addeventcategory =() => {
