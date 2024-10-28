@@ -42,7 +42,7 @@ const Boli = () => {
             <Section>
                 <h2 className="text-2xl font-bold mb-2">Boli Management</h2>
             </Section>
-            <div>
+            {/* <div>
                 <div className="text-sm font-medium text-center text-gray-500 border-gray-200 dark:text-gray-400 dark:border-gray-700">
                     <ul className="flex flex-wrap -mb-px">
                         {tabs.map(tab => (
@@ -67,13 +67,14 @@ const Boli = () => {
                     </ul>
                 </div>
 
-                {/* Tab Content */}
+                
                 <div className="p-4">
                     {activeTab === 'BoliGroup' && <BoliGroup />}
                     {activeTab === 'BoliLedger' && <BoliLedger />}
                     {activeTab === 'BoliVoucher' && <BoliVoucher />}
                 </div>
-            </div>
+            </div> */}
+            <BoliVoucher />
         </>
     );
 };

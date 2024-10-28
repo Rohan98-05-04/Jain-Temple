@@ -64,7 +64,7 @@ const ViewMandirUser = ({ DonorId }) => {
             <Section>
                 {isLoading && <Spinner />}
                 <div className="">
-                    <h2 className='text-center'>Donar</h2>
+                    <h2 className='text-center mb-4'>Donor</h2>
                     <div className="DonarViewcard">
                         <div className="card-body">
                             <i className="fa fa-pen fa-xs edit"></i>
@@ -122,7 +122,7 @@ const ViewMandirUser = ({ DonorId }) => {
                                     {donarData?.dob && (
 
                                         <tr>
-                                            <th className="w-60 bg-gray-100 border border-gray-300 p-2">dob</th>
+                                            <th className="w-60 bg-gray-100 border border-gray-300 p-2">D.O.B.</th>
                                             <td className="border border-gray-300 text-nowrap p-2">{donarData?.dob ? formatDate(donarData.dob) : '-'}</td>
                                         </tr>
                                     )}

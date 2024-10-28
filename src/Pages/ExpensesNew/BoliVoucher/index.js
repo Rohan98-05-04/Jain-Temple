@@ -33,33 +33,28 @@ export default function BoliVoucher() {
     const closeViewModal = () => setModalViewOpen(false);
     const closeDetailModal = () => setModalDetailOpen(false);
 
-    useEffect(() => {
+    const fetchEvents = async() => {
         setIsLoading(true);
+        const response = await fetch(`${API_BASE_URL}/expenses/getAllExpenses?expenseType=expensevoucher&page=${activePage}&size=${size}&search=${search}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-        const fetchData = async () => {
-            const response = await fetch(`${API_BASE_URL}/expenses/getAllExpenses?expenseType=expensevoucher&page=${activePage}&size=${size}&search=${search}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setData(data.data);
-                setDonationData(data.data);
-                setPaginationData(data.data);
-                setIsLoading(false);
-            } else {
-                const data = await response.json();
-                console.error(data.errorMessage);
-                alert(data.errorMessage);
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [activePage, search]);
+        if (response.ok) {
+            const data = await response.json();
+            setData(data.data);
+            setDonationData(data.data);
+            setPaginationData(data.data);
+            setIsLoading(false);
+        } else {
+            const data = await response.json();
+            console.error(data.errorMessage);
+            alert(data.errorMessage);
+            setIsLoading(false);
+        }
+    };
 
     const handlePageChange = (pageNumber) => {
         setActivePage(pageNumber);
@@ -74,7 +69,7 @@ export default function BoliVoucher() {
     };
     const closeConfirmDeleteModal = () => setConfirmDeleteOpen(false);
 
-    
+
 
 
     const handleDelete = async () => {
@@ -92,16 +87,26 @@ export default function BoliVoucher() {
 
         if (response.ok) {
             toast.success("Record deleted successfully");
+            handleRefresh();
             closeConfirmDeleteModal();
         } else {
             const data = await response.json();
             console.error(data.errorMessage);
+            handleRefresh();
             closeConfirmDeleteModal();
         }
         setIsLoading(false);
     };
 
-    
+    useEffect(() => {
+        fetchEvents();
+    }, [activePage, search]);
+
+    const handleRefresh = () => {
+        fetchEvents();
+    };
+
+
 
     return (
         <>
@@ -109,7 +114,7 @@ export default function BoliVoucher() {
                 {isLoading && <Spinner />}
                 <div className="donarDetailMainPage">
                     <Section>
-                        <h2 className="text-2xl font-bold mb-4">Expense Voucher</h2>
+                        {/* <h2 className="text-2xl font-bold mb-4">Expense Voucher</h2> */}
                         <div className="flex flex-col md:flex-row justify-between mb-3">
                             {/* Search Bar */}
                             <div className="relative mb-4 md:mb-0">
@@ -126,7 +131,7 @@ export default function BoliVoucher() {
                             </div>
                             {/* Add Donar Button */}
                             <div>
-                                <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add Expense Voucher</button>
+                                <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add Expense </button>
                             </div>
                         </div>
                     </Section>
@@ -148,7 +153,7 @@ export default function BoliVoucher() {
                                     {donationData?.data?.map((donation, index) => (
                                         <tr key={index} className="hover:bg-gray-100">
                                             <td className="py-2 px-4 border-b text-nowrap">{donation.ledgerNo}</td>
-                                            <td className="py-2 px-4 border">{donation.ledgerName}</td>
+                                            <td className="py-2 px-4 border">{donation.fullname}</td>
                                             <td className="py-2 px-4 border">{donation.paymentMode}</td>
                                             <td className="py-2 px-4 border">{donation.totalAmount}</td>
                                             <td className="py-2 px-4 border">{donation.narration}</td>
@@ -188,8 +193,8 @@ export default function BoliVoucher() {
                     </Section>
                 </div>
             </div>
-            <BoliVoucherModal isOpen={isModalOpen} onClose={closeModal} />
-            <ModalEditBoliVoucher isOpen={isModalViewOpen} onClose={closeViewModal} Id={Id} />
+            <BoliVoucherModal isOpen={isModalOpen} onClose={closeModal} onRefresh={handleRefresh} />
+            <ModalEditBoliVoucher isOpen={isModalViewOpen} onClose={closeViewModal} Id={Id} onRefresh={handleRefresh} />
             <ModalViewBoliVoucher isOpen={isModalDetailOpen} onClose={closeDetailModal} BoliLedgerId={Id} />
             <ModalConfirmDelete
                 isOpen={isConfirmDeleteOpen}

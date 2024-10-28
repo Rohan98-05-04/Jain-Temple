@@ -77,7 +77,7 @@ const Sidebar = () => {
             },
             {
               href: '/mandir-users',
-              label: 'Mandir Donation',
+              label: 'Mandir Donor',
               icon: (props) => <FaUserShield {...props} style={iconStyle} />
             },
             {
@@ -103,6 +103,16 @@ const Sidebar = () => {
             {
               href: '/committee-members',
               label: 'Committee members',
+              icon: (props) => <IoIosPeople {...props} style={iconStyle} />
+            },
+            {
+              href: '/videos',
+              label: 'Videos Links',
+              icon: (props) => <IoIosPeople {...props} style={iconStyle} />
+            },
+            {
+              href: '/gallery',
+              label: 'Gallery',
               icon: (props) => <IoIosPeople {...props} style={iconStyle} />
             },
             {

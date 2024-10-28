@@ -38,6 +38,21 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
         fetchData();
     }, [BoliLedgerId]);
 
+    const [formData, setFormData] = useState({
+        expenseType: 'expensevoucher',
+        narration: '',
+        city: '',
+        pincode: '',
+        state: '',
+        country: '',
+        mobile: '',
+        fullname: '',
+        fathersName: '',
+        address: '',
+        email: '',
+        vouchers: [], // Initialize vouchers array
+    });
+
 
     return (
         <Section>
@@ -45,9 +60,8 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
                 <Spinner />
             ) : donorData ? (
                 <>
-                    <h2 className="text-center">Expense Voucher Information</h2>
+                    <h2 className="text-center">Expense Information</h2>
                     <div className="flex justify-between">
-                        <p className="text-black"><span className="text-gray-500">Voucher Number : </span>{donorData.voucherNo}</p>
                         <p className="text-black"><span className="text-gray-500">Ledger Number : </span>{donorData.ledgerNo}</p>
                     </div>
 
@@ -56,7 +70,7 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
                             <tbody>
                                 <tr>
                                     <th className="w-60 bg-gray-100 border border-gray-300 p-2">Name</th>
-                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.ledgerName}</td>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.fullname}</td>
                                 </tr>
                                 <tr>
                                     <th className="border bg-gray-100 border-gray-300 p-2">Payment Mode</th>
@@ -67,12 +81,41 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
                                     <td className="border border-gray-300 text-nowrap p-2">{donorData.totalAmount}</td>
                                 </tr>
                                 <tr>
+                                    <th className="border bg-gray-100 border-gray-300 p-2">Father`s Name</th>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.fathersName}</td>
+                                </tr>
+                                <tr>
+                                    <th className="border bg-gray-100 border-gray-300 p-2">Email</th>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.email}</td>
+                                </tr>
+                                <tr>
+                                    <th className="border bg-gray-100 border-gray-300 p-2">Address</th>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.address}</td>
+                                </tr>
+                                <tr>
+                                    <th className="border bg-gray-100 border-gray-300 p-2">City</th>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.city}</td>
+                                </tr>
+                                <tr>
+                                    <th className="border bg-gray-100 border-gray-300 p-2">State</th>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.state}</td>
+                                </tr>
+                                <tr>
+                                    <th className="border bg-gray-100 border-gray-300 p-2">Country</th>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.country}</td>
+                                </tr>
+                                <tr>
+                                    <th className="border bg-gray-100 border-gray-300 p-2">Pincode</th>
+                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.pincode}</td>
+                                </tr>
+                                <tr>
                                     <th className="border bg-gray-100 border-gray-300 p-2">Narration</th>
                                     <td className="border border-gray-300 text-nowrap p-2">{donorData.narration}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+
                     {donorData.vouchers.length > 0 ?
                         <div className="overflow-x-auto">
                             <h3 className="mb-2">Expense Voucher Details</h3>
@@ -81,7 +124,6 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
                                     <thead>
                                         <tr className="bg-gray-100">
                                             <th className="border border-gray-300 p-2">Expense Head</th>
-                                            <th className="border border-gray-300 p-2">Voucher No</th>
                                             <th className="border border-gray-300 p-2">Amount</th>
                                             <th className="border border-gray-300 p-2">Remark</th>
                                         </tr>
@@ -90,7 +132,6 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
                                         {donorData.vouchers.map((donation) => (
                                             <tr key={donation._id}>
                                                 <td className="border border-gray-300 p-2">{donation.expenseHead}</td>
-                                                <td className="border border-gray-300 p-2">{donation.voucherNo}</td>
                                                 <td className="border border-gray-300 p-2">{donation.amount}</td>
                                                 <td className="border border-gray-300 p-2">{donation.remark}</td>
                                             </tr>

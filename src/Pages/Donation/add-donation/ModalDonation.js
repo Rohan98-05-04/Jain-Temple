@@ -2,17 +2,18 @@
 import React, { useState } from 'react';
 import AddDonation from '.';
 
-const ModalDonation = ({ isOpen, onClose }) => {
+const ModalDonation = ({ isOpen, onClose, onRefresh }) => {
     const [accepted, setAccepted] = useState(false);
 
     const handleClose = () => {
-        // Reset the accepted state when closing
-        setAccepted(false);
+        setAccepted(false); // Reset state if needed
         onClose();
     };
 
     const handleSignUpSuccess = () => {
         setAccepted(true);
+        onRefresh(); // Refresh the event list after success
+        handleClose(); // Close the modal
     };
 
     if (!isOpen) return null;
@@ -31,7 +32,7 @@ const ModalDonation = ({ isOpen, onClose }) => {
             >
                 <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                     <div className="p-4 md:p-5 space-y-4">
-                        <AddDonation />
+                        <AddDonation onSuccess={handleSignUpSuccess} />
                     </div>
                 </div>
             </div>

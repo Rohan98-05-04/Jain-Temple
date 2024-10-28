@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from 'utils/config';
 
-const EditBoliVoucher = ({ id }) => {
+const EditBoliVoucher = ({ id,onSuccess }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [ledgerNumber, setLedgerNumber] = useState('');
     const [formData, setFormData] = useState({
@@ -93,7 +93,7 @@ const EditBoliVoucher = ({ id }) => {
 
         if (response.ok) {
             toast.success('Boli Group updated successfully');
-            router.push('/boli#voucher');
+            onSuccess();
             fetchBoliHeads();
         } else {
             toast.error('Failed to update Boli');
@@ -130,7 +130,7 @@ const EditBoliVoucher = ({ id }) => {
             try {
                 const response = await fetch(`${API_BASE_URL}/boliDetail/getAllBoliHeads`);
                 const result = await response.json();
-                setDonationTypes(result.data);
+                setDonationTypes(result.data.data);
             } catch (error) {
                 console.error("Error fetching Boli Heads:", error);
             }
@@ -271,45 +271,6 @@ const EditBoliVoucher = ({ id }) => {
                                 type="text"
                                 name="country"
                                 value={formData.country}
-                                onChange={handleChange}
-                                className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="aadharNo">
-                                Aadhar no.
-                            </label>
-                            <input
-                                type="text"
-                                name="aadharNo"
-                                value={formData.aadharNo}
-                                onChange={handleChange}
-                                className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="openingBalance">
-                                Opening Balance
-                            </label>
-                            <input
-                                type="number"
-                                name="openingBalance"
-                                value={formData.openingBalance}
-                                onChange={handleChange}
-                                className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="panNo">
-                                PAN No.
-                            </label>
-                            <input
-                                type="text"
-                                name="panNo"
-                                value={formData.panNo}
                                 onChange={handleChange}
                                 className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 required

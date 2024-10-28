@@ -2,17 +2,18 @@
 import React, { useState } from 'react';
 import AddBoliVoucher from './addBoliVoucher';
 
-const BoliVoucherModal = ({ isOpen, onClose }) => {
+const BoliVoucherModal = ({ isOpen, onClose, onRefresh }) => {
     const [accepted, setAccepted] = useState(false);
 
     const handleClose = () => {
-        // Reset the accepted state when closing
-        setAccepted(false);
+        setAccepted(false); // Reset state if needed
         onClose();
     };
 
     const handleSignUpSuccess = () => {
         setAccepted(true);
+        onRefresh(); // Refresh the event list after success
+        handleClose(); // Close the modal
     };
 
     if (!isOpen) return null;
@@ -36,7 +37,7 @@ const BoliVoucherModal = ({ isOpen, onClose }) => {
                         </h3>
                     </div>
                     <div className="p-4 md:p-5 space-y-4">
-                        <AddBoliVoucher/>
+                        <AddBoliVoucher onSuccess={handleSignUpSuccess}/>
                     </div>
                 </div>
             </div>

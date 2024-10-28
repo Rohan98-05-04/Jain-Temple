@@ -2,17 +2,18 @@
 import React, { useState } from 'react';
 import EditBoliVoucher from './editVoucher';
 
-const ModalEditBoliVoucher = ({ isOpen, onClose, Id }) => {
+const ModalEditBoliVoucher = ({ isOpen, onClose, Id, onRefresh }) => {
     const [accepted, setAccepted] = useState(false);
 
     const handleClose = () => {
-        // Reset the accepted state when closing
-        setAccepted(false);
+        setAccepted(false); // Reset state if needed
         onClose();
     };
 
     const handleSignUpSuccess = () => {
         setAccepted(true);
+        onRefresh(); // Refresh the event list after success
+        handleClose(); // Close the modal
     };
 
     if (!isOpen) return null;
@@ -30,8 +31,13 @@ const ModalEditBoliVoucher = ({ isOpen, onClose, Id }) => {
                 onClick={e => e.stopPropagation()}
             >
                 <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <div className="text-center p-4 md:p-5 rounded-t dark:border-gray-600">
+                        <h3 className="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                            Update Expense 
+                        </h3>
+                    </div>
                     <div className="p-4 md:p-5 space-y-4">
-                        <EditBoliVoucher id={Id} />
+                        <EditBoliVoucher id={Id} onSuccess={handleSignUpSuccess} />
                     </div>
                 </div>
             </div>

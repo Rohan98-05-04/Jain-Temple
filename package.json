@@ -11,6 +11,7 @@
   "dependencies": {
     "@tabler/icons-react": "^3.17.0",
     "@tsndr/cloudflare-worker-jwt": "^2.2.2",
+    "axios": "^1.7.7",
     "chart.js": "^4.2.1",
     "clsx": "^2.1.1",
     "eslint": "8.27.0",

@@ -535,7 +535,7 @@ export default function UpdateMandirUsers({ DonorId }) {
                   onChange={(e) => setPincode(e.target.value)}
                 />
               </div>
-              <div className="label-form role">
+              {/* <div className="label-form role">
                 <label htmlFor="role">Role</label><br />
                 <select
                   name="role"
@@ -548,7 +548,7 @@ export default function UpdateMandirUsers({ DonorId }) {
                     <option key={type._id} value={type._id}>{type.nameHindi}</option>
                   ))}
                 </select>
-              </div>
+              </div> */}
               {/* <div className="label-form country">
                 <label htmlFor="country">Country</label><br />
               <input

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from 'utils/config';
 
-const AddBoliVoucher = () => {
+const AddBoliVoucher = ({onSuccess}) => {
     const [autoData, setAutoData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [ledgerNumber, setLedgerNumber] = useState('');
@@ -77,7 +77,7 @@ const AddBoliVoucher = () => {
         e.preventDefault();
         const donations = formData.voucher
             .map(payment => ({
-                boliHeadtype: payment.typeOfDonation || null,
+                boliHeadtype: payment.boliHeadtype || null,
                 boliAmount: Number(payment.boliAmount),
                 remark: payment.remark || null,
             }))
@@ -108,7 +108,7 @@ const AddBoliVoucher = () => {
 
         if (response.ok) {
             toast.success('Boli Voucher created successfully');
-            router.push('/boli#voucher');
+            onSuccess();
             fetchBoliHeads();
         } else {
             toast.error('Failed to create Boli');
@@ -148,7 +148,7 @@ const AddBoliVoucher = () => {
         }
     }, [ledgerNumber]);
 
-    const [donationTypes, setDonationTypes] = useState();
+    const [donationTypes, setDonationTypes] = useState([]);
 
     useEffect(() => {
         const fetchBoliHeads = async () => {
@@ -156,7 +156,6 @@ const AddBoliVoucher = () => {
                 const response = await fetch(`${API_BASE_URL}/boliDetail/getAllBoliHeads`);
                 const result = await response.json();
                 setDonationTypes(result.data.data);
-                console.log(result)
             } catch (error) {
                 console.error("Error fetching Boli Heads:", error);
             }
@@ -168,19 +167,6 @@ const AddBoliVoucher = () => {
     return (
         <form onSubmit={handleSubmit} className="max-w-5xl mx-auto">
             <div className='grid md:grid-cols-3 gap-6'>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ledgerNumber">
-                        Ledger Number
-                    </label>
-                    <input
-                        type="text"
-                        name="ledgerNumber"
-                        value={ledgerNumber}
-                        onChange={handleLedgerNumber}
-                        className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                    />
-                </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="mobile">
                         Mobile no.
@@ -298,45 +284,6 @@ const AddBoliVoucher = () => {
                         required
                     />
                 </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="aadharNo">
-                        Aadhar no.
-                    </label>
-                    <input
-                        type="text"
-                        name="aadharNo"
-                        value={formData.aadharNo}
-                        onChange={handleChange}
-                        className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="panNo">
-                        PAN no.
-                    </label>
-                    <input
-                        type="text"
-                        name="panNo"
-                        value={formData.panNo}
-                        onChange={handleChange}
-                        className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="openingBalance">
-                        Opening Balance
-                    </label>
-                    <input
-                        type="number"
-                        name="openingBalance"
-                        value={formData.openingBalance}
-                        onChange={handleChange}
-                        className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                    />
-                </div>
             </div>
             <div>
                 <h3 className="text-lg font-semibold mt-4">Boli Details</h3>
@@ -360,7 +307,7 @@ const AddBoliVoucher = () => {
                                         className="border rounded-md p-1 w-full"
                                     >
                                         <option value="" disabled>Select Boli Head Type</option>
-                                        {donationTypes?.map((type) => (
+                                        {donationTypes.map((type) => (
                                             <option key={type._id} value={type._id}>{type.nameHindi}</option>
                                         ))}
                                     </select>

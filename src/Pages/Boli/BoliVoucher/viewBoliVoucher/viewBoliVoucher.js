@@ -21,7 +21,8 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setDonationTypes(data.data);
+                    setDonationTypes(data.data.data);
+                    console.log("data",donationTypes)
                 } else {
                     const errorData = await response.json();
                     toast.error(errorData.errorMessage);
@@ -65,7 +66,9 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
     }, [BoliLedgerId]);
 
     const getDonationTypeName = (id) => {
+        console.log("Searching for ID:", id); // Log the ID you're searching for
         const type = donationTypes.find(type => type._id === id);
+        console.log("Donation type found:", type); // Check what is found
         return type ? type.nameHindi : "N/A";
     };
 
@@ -99,15 +102,6 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
                                     <th className="border bg-gray-100 border-gray-300 p-2">Address</th>
                                     <td className="border border-gray-300 text-nowrap p-2">{donorData.address}</td>
                                 </tr>
-
-                                <tr>
-                                    <th className="border bg-gray-100 border-gray-300 p-2">PAN No</th>
-                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.panNo}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border bg-gray-100 border-gray-300 p-2">Aadhar No</th>
-                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.aadharNo}</td>
-                                </tr>
                                 <tr>
                                     <th className="border bg-gray-100 border-gray-300 p-2">Email</th>
                                     <td className="border border-gray-300 text-nowrap p-2">{donorData.email}</td>
@@ -127,10 +121,6 @@ export default function ViewBoliVoucher({ BoliLedgerId }) {
                                 <tr>
                                     <th className="border bg-gray-100 border-gray-300 p-2">Country</th>
                                     <td className="border border-gray-300 text-nowrap p-2">{donorData.country}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border bg-gray-100 border-gray-300 p-2">Opening Balance</th>
-                                    <td className="border border-gray-300 text-nowrap p-2">{donorData.openingBalance}</td>
                                 </tr>
                             </tbody>
                         </table>

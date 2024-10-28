@@ -42,7 +42,7 @@ const ExpensesNew = () => {
             <Section>
                 <h2 className="text-2xl font-bold mb-2">Expenses</h2>
             </Section>
-            <div>
+            {/* <div>
                 <div className="text-sm font-medium text-center text-gray-500 border-gray-200 dark:text-gray-400 dark:border-gray-700">
                     <ul className="flex flex-wrap -mb-px">
                         {tabs.map(tab => (
@@ -67,13 +67,13 @@ const ExpensesNew = () => {
                     </ul>
                 </div>
 
-                {/* Tab Content */}
                 <div className="p-4">
                     {activeTab === 'ExpensesGroup' && <BoliGroup />}
                     {activeTab === 'ExpensesLedger' && <BoliLedger />}
                     {activeTab === 'ExpensesVoucher' && <BoliVoucher />}
                 </div>
-            </div>
+            </div> */}
+            <BoliVoucher />
         </>
     );
 };

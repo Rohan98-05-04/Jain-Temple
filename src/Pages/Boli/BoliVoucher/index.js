@@ -33,33 +33,28 @@ export default function BoliVoucher() {
     const closeViewModal = () => setModalViewOpen(false);
     const closeDetailModal = () => setModalDetailOpen(false);
 
-    useEffect(() => {
+    const fetchEvents = async () => {
+        const token = localStorage.getItem('token');
+        const parseToken = JSON.parse(token) || {};
         setIsLoading(true);
 
-        const fetchData = async () => {
-            const response = await fetch(`${API_BASE_URL}/boliDetail/getAllBolis?boliType=${"bolivoucher"}&page=${activePage}&size=${size}&search=${search}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+        const response = await fetch(`${API_BASE_URL}/boliDetail/getAllBolis?boliType=${"bolivoucher"}&page=${activePage}&size=${size}&search=${search}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${parseToken}`,
+            },
+        });
 
-            if (response.ok) {
-                const data = await response.json();
-                setData(data.data);
-                setDonationData(data.data);
-                setPaginationData(data.data);
-                setIsLoading(false);
-            } else {
-                const data = await response.json();
-                console.error(data.errorMessage);
-                alert(data.errorMessage);
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [activePage, search]);
+        if (response.ok) {
+            const data = await response.json();
+            setData(data.data);
+            setDonationData(data.data);
+            setPaginationData(data.data);
+            setIsLoading(false);
+        }
+        setIsLoading(false);
+    };
 
     const handlePageChange = (pageNumber) => {
         setActivePage(pageNumber);
@@ -74,8 +69,13 @@ export default function BoliVoucher() {
     };
     const closeConfirmDeleteModal = () => setConfirmDeleteOpen(false);
 
-    
+    useEffect(() => {
+        fetchEvents();
+    }, [activePage, search]);
 
+    const handleRefresh = () => {
+        fetchEvents();
+    };
 
     const handleDelete = async () => {
         const token = localStorage.getItem('token');
@@ -101,7 +101,7 @@ export default function BoliVoucher() {
         setIsLoading(false);
     };
 
-    
+
 
     return (
         <>
@@ -109,8 +109,7 @@ export default function BoliVoucher() {
                 {isLoading && <Spinner />}
                 <div className="donarDetailMainPage">
                     <Section>
-                        <h2 className="text-2xl font-bold mb-4">Boli Ledger</h2>
-                        <div className="flex flex-col md:flex-row justify-between mb-3">
+                        <div className="flex flex-col md:flex-row justify-between">
                             {/* Search Bar */}
                             <div className="relative mb-4 md:mb-0">
                                 <input
@@ -126,7 +125,7 @@ export default function BoliVoucher() {
                             </div>
                             {/* Add Donar Button */}
                             <div>
-                                <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add Boli Voucher</button>
+                                <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add Boli</button>
                             </div>
                         </div>
                     </Section>
@@ -136,7 +135,7 @@ export default function BoliVoucher() {
                             <table className="min-w-full text-left border border-gray-300">
                                 <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="w-48 py-2 px-4 text-nowrap border-b">Ledger No.</th>
+                                        <th className="w-48 py-4 px-4 text-nowrap border-b">Ledger No.</th>
                                         <th className="py-2 px-4 border">Full Name</th>
                                         <th className="py-2 px-4 border">Email</th>
                                         <th className="py-2 px-4 border">Mobile</th>
@@ -147,7 +146,7 @@ export default function BoliVoucher() {
                                 <tbody>
                                     {donationData?.data?.map((donation, index) => (
                                         <tr key={index} className="hover:bg-gray-100">
-                                            <td className="py-2 px-4 border-b">{donation.ledgerNumber}</td>
+                                            <td className="py-4 px-4 border-b text-nowrap ">{donation.ledgerNumber}</td>
                                             <td className="py-2 px-4 border">{donation.fullName}</td>
                                             <td className="py-2 px-4 border">{donation.email}</td>
                                             <td className="py-2 px-4 border">{donation.mobile}</td>
@@ -188,8 +187,8 @@ export default function BoliVoucher() {
                     </Section>
                 </div>
             </div>
-            <BoliVoucherModal isOpen={isModalOpen} onClose={closeModal} />
-            <ModalEditBoliVoucher isOpen={isModalViewOpen} onClose={closeViewModal} Id={Id} />
+            <BoliVoucherModal isOpen={isModalOpen} onClose={closeModal} onRefresh={handleRefresh}/>
+            <ModalEditBoliVoucher isOpen={isModalViewOpen} onClose={closeViewModal} Id={Id}  onRefresh={handleRefresh}/>
             <ModalViewBoliVoucher isOpen={isModalDetailOpen} onClose={closeDetailModal} BoliLedgerId={Id} />
             <ModalConfirmDelete
                 isOpen={isConfirmDeleteOpen}

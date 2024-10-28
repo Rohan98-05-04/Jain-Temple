@@ -3,22 +3,18 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { API_BASE_URL } from "../../../../utils/config";
+import { API_BASE_URL } from "../../../../../utils/config";
 import { Multiselect } from "multiselect-react-dropdown";
 import { ToastContainer, toast } from 'react-toastify';
 import Section from "@aio/components/Section";
-import styles from "../event.module.css";
 import 'react-toastify/dist/ReactToastify.css';
-import Spinner from '../../../components/Spinner'; 
+import Spinner from '../../../../components/Spinner'; 
 
-export default function AddEventCategories() {
+export default function AddEventCategories({ onSuccess }) {
   const [name, setEventNameCategory] = useState("");
   const [description, setEventDetailCategory] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-
   const router = useRouter();
- 
 
   const addEventCategory = () => {
     if (name.trim() === "" || description.trim() === "") {
@@ -31,7 +27,7 @@ export default function AddEventCategories() {
     setIsLoading(true);
 
     const fetchData = async () => {
-      const response = await fetch(`${API_BASE_URL}//event/addeventCategory`, {
+      const response = await fetch(`${API_BASE_URL}/event/addeventCategory`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,12 +38,11 @@ export default function AddEventCategories() {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success('Add successfully', {
+        toast.success('Added successfully', {
           position: toast.POSITION.TOP_RIGHT,
         });
-        router.push("/event");
+        onSuccess();
         setIsLoading(false);
-        
       } else {
         const data = await response.json();
         toast.error(data.errorMessage, {
@@ -61,56 +56,43 @@ export default function AddEventCategories() {
 
   return (
     <Section>
-       {isLoading &&    <Spinner/>  }
-    <div className="donarPage w-100">
-      <ToastContainer position="top-right" autoClose={5000} />
-
-      <div className="addDonarForm">
-        <h2 className={`${styles.formHeaderext}`}>Enter Event category</h2>
+      {isLoading && <Spinner />}
+      <div className="w-full px-6">
+        <ToastContainer position="top-right" autoClose={5000} />
+        <h2 className="text-3xl font-semibold mb-4 text-center">Enter Event Category</h2>
         <form>
-          <div className="formMainDiv">
-            <div className="label-form eventInp">
-              <label htmlFor="name">Event Name Category</label>
-              <br />
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Event Name Category</label>
               <input
                 type="text"
                 id="name"
                 value={name}
                 onChange={(e) => setEventNameCategory(e.target.value)}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-           
-           
-          <div className="label-form textAraeLabel">
-              <label htmlFor="description">Event Detail Category</label>
-              <br />
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Event Detail Category</label>
               <textarea
-              className="textareaEvent"
-                type="text"
                 id="description"
                 value={description}
                 onChange={(e) => setEventDetailCategory(e.target.value)}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 h-24"
               />
             </div>
           </div>
-
-        
-
-          <div className="d-flex ">
-            <div className="submitEvent addDonarSubmitBtnMain">
-              <button
-                className="addDonarSubmitBtn"
-                type="button"
-                onClick={addEventCategory}
-              >
-                Submit
-              </button>
-            </div>
-            <div className="nextDonarSubmitBtnMain"></div>
+          <div className="flex justify-between mt-6">
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="button"
+              onClick={addEventCategory}
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>
-    </div>
     </Section>
   );
 }

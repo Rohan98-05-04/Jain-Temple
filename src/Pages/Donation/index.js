@@ -25,37 +25,34 @@ const Donation = () => {
   const closeModal = () => setModalOpen(false);
   const closeViewModal = () => setModalViewOpen(false);
 
-  useEffect(() => {
+  const fetchEvents = async () => {
     const token = localStorage.getItem('token');
     const parseToken = JSON.parse(token) || {};
     setIsLoading(true);
+    const response = await fetch(`${API_BASE_URL}/donationDetail/getAllDonations?page=${activePage}&size=${size}&search=${search}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${parseToken}`,
+      },
+    });
 
-    const fetchData = async () => {
-      const response = await fetch(`${API_BASE_URL}/donationDetail/getAllDonations?page=${activePage}&size=${size}&search=${search}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${parseToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setData(data.data);
+    if (response.ok) {
+      const data = await response.json();
+      setData(data.data);
         setDonationData(data.data);
         setPaginationData(data.data.pagination);
-        console.log("donationData", donationData)
-        setIsLoading(false);
-      } else {
-        const data = await response.json();
-        console.error(data.errorMessage);
-        alert(data.errorMessage);
-        setIsLoading(false);
-      }
-    };
+    }
+    setIsLoading(false);
+  };
 
-    fetchData();
+  useEffect(() => {
+    fetchEvents();
   }, [activePage, search]);
+
+  const handleRefresh = () => {
+    fetchEvents();
+  };
 
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
@@ -88,11 +85,11 @@ const Donation = () => {
               <button onClick={openModal} className="bg-orange-400 text-white py-2 px-4 rounded-md">Add Donation</button>
             </div>
 
-            <Link href='/donation/add-outside-donation'>
+            {/* <Link href='/donation/add-outside-donation'>
               <button className="btn btn-secondary">
                 Add Outsider Donation
               </button>
-            </Link>
+            </Link> */}
           </div>
         </Section>
 
@@ -145,7 +142,7 @@ const Donation = () => {
           </div>
         </Section>
       </div>
-      <ModalDonation isOpen={isModalOpen} onClose={closeModal} />
+      <ModalDonation isOpen={isModalOpen} onClose={closeModal} onRefresh={handleRefresh} />
       <ModalViewDonation isOpen={isModalViewOpen} onClose={closeViewModal} donationId={donationId} />
     </div>
   );

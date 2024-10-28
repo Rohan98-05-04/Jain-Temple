@@ -3,6 +3,7 @@ import Section from '@aio/components/Section';
 import BoliHead from './BoliHead';
 import TypeDonation from './TypeDonation';
 import Role from './Roles';
+import EventCategory from './EventCategory';
 
 const MastersHome = () => {
     const [activeTab, setActiveTab] = useState('BoliHead');
@@ -11,6 +12,7 @@ const MastersHome = () => {
         { name: 'Boli Head', id: 'BoliHead', href: '#BoliHead' },
         { name: 'Type Donation', id: 'TypeDonation', href: '#TypeDonation' },
         { name: 'Role', id: 'Role', href: '#Role' },
+        { name: 'Event Category', id: 'EventCategory', href: '#EventCategory' },
     ];
 
     useEffect(() => {
@@ -71,6 +73,7 @@ const MastersHome = () => {
                     {activeTab === 'BoliHead' && <BoliHead />}
                     {activeTab === 'TypeDonation' && <TypeDonation />}
                     {activeTab === 'Role' && <Role />}
+                    {activeTab === 'EventCategory' && <EventCategory />}
                 </div>
             </div>
         </>
