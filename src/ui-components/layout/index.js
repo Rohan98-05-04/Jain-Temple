@@ -78,32 +78,32 @@ export function SidebarDemo() {
     },
   ];
 
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
-  return (
-    <div className="flex flex-col bg-gray-100 dark:bg-neutral-800 border border-neutral-200 max-h-full dark:border-neutral-700">
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div>
-          </div>
-          <div>
-            <SidebarLink
-              link={{
-                label: "Manu Arora",
-                href: "#",
-              }}
-            />
-          </div>
-        </SidebarBody>
-      </Sidebar>
-    </div>
-  );
+  // return (
+  //   <div className="flex flex-col bg-gray-100 dark:bg-neutral-800 border border-neutral-200 max-h-full dark:border-neutral-700">
+  //     <Sidebar open={open} setOpen={setOpen}>
+  //       <SidebarBody className="justify-between gap-10">
+  //         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+  //           {open ? <Logo /> : <LogoIcon />}
+  //           <div className="mt-8 flex flex-col gap-2">
+  //             {links.map((link, idx) => (
+  //               <SidebarLink key={idx} link={link} />
+  //             ))}
+  //           </div>
+  //         </div>
+  //         <div>
+  //           <SidebarLink
+  //             link={{
+  //               label: "Manu Arora",
+  //               href: "#",
+  //             }}
+  //           />
+  //         </div>
+  //       </SidebarBody>
+  //     </Sidebar>
+  //   </div>
+  // );
 }
 
 export const Logo = () => {

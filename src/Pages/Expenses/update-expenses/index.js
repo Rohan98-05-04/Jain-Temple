@@ -134,7 +134,7 @@ export default function UpdateExpenses() {
     if (slug.slug) {
       let jsonString = [];
       const token = localStorage.getItem("token");
-      const parseToken = JSON.parse(token) || {};
+      const parseToken = (token) || {};
       const fetchData = async () => {
         const response = await fetch(
           `${API_BASE_URL}/expense/getExpense/${slug.slug}`,
@@ -234,7 +234,7 @@ export default function UpdateExpenses() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/event/getallevent`, {
@@ -260,7 +260,7 @@ export default function UpdateExpenses() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       const response = await fetch(
@@ -294,7 +294,7 @@ export default function UpdateExpenses() {
     }
 
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     const inputData = {
       expensesCategoryId: expensesCategoryId._id,
       expensesStatus,

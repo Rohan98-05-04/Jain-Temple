@@ -47,7 +47,7 @@ const MandirUsers = () => {
     updatedIsActive[index] = checked;
     setIsActive(updatedIsActive);
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     const fetchData = async () => {
@@ -79,7 +79,7 @@ const MandirUsers = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/donor/getalldonor?page=${activePage}&size=${size}&search=${search}`, {

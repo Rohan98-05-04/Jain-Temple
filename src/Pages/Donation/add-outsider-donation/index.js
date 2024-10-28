@@ -99,7 +99,7 @@ export default function AddOutsiderDonation() {
   
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/donor/getalldonor`, {
         method: "GET",
@@ -125,7 +125,7 @@ export default function AddOutsiderDonation() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/event/getallevent?size=${size}`, {
@@ -241,7 +241,7 @@ export default function AddOutsiderDonation() {
 
   const addEvent = () => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     const dailyEvent = [];
     const eventCategory = [];
 

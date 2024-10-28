@@ -30,7 +30,7 @@ const Gallery = () => {
 
   const fetchEvents = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
     const response = await fetch(
       `${API_BASE_URL}/gallery/getAllGalleries?page=${activePage}&size=${size}&search=${search}`,
@@ -74,7 +74,7 @@ const Gallery = () => {
 
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     setIsLoading(true);
     const response = await fetch(

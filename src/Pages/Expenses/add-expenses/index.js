@@ -104,7 +104,7 @@ export default function AddExpenses() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/event/getallevent`, {
@@ -130,7 +130,7 @@ export default function AddExpenses() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     const fetchData = async () => {
       const response = await fetch(
@@ -163,7 +163,7 @@ export default function AddExpenses() {
       return;
     }
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     const inputData = {
       expensesCategoryId,
       expensesStatus,

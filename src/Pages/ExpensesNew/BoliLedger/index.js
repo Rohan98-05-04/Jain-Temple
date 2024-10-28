@@ -40,7 +40,7 @@ const BoliLedger = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     const fetchData = async () => {
@@ -74,7 +74,7 @@ const BoliLedger = () => {
 
   const handleDelete = async () => {
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     setIsLoading(true);
     const response = await fetch(`${API_BASE_URL}/expenses/deleteExpense/${deleteId}`, {

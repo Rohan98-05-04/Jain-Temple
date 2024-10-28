@@ -74,7 +74,7 @@ export default function BoliVoucher() {
 
     const handleDelete = async () => {
         const token = localStorage.getItem('token');
-        const parseToken = JSON.parse(token) || {};
+        const parseToken = (token) || {};
 
         setIsLoading(true);
         const response = await fetch(`${API_BASE_URL}/expenses/deleteExpense/${Id}`, {

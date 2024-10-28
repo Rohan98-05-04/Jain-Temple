@@ -30,7 +30,7 @@ const BhajanVideos = () => {
 
   const fetchEvents = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
     const response = await fetch(
       `${API_BASE_URL}/bhashan/getAllBhashans?page=${activePage}&size=${size}&search=${search}`,
@@ -74,7 +74,7 @@ const BhajanVideos = () => {
 
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
 
     setIsLoading(true);
     const response = await fetch(

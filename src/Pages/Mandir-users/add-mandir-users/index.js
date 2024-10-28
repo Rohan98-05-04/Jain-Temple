@@ -185,7 +185,7 @@ export default function AddMandirUsers() {
       }); return;
     }
     const token = localStorage.getItem('token');
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     let inputData = {
       image, firstName, lastName, phoneNumbers: [{ Phonenumber1: phoneNumberOne, Phonenumber2: phoneNumberTwo }], gotr, role: selectedRole, dateOfAnniversary, dob,
       occupation, isHead, email, aadharNo, aadharCardImage: aadharcardimage, bloodGroup, address: {

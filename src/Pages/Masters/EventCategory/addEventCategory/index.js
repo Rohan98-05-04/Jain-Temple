@@ -23,7 +23,7 @@ export default function AddEventCategories({ onSuccess }) {
     }
 
     const token = localStorage.getItem("token");
-    const parseToken = JSON.parse(token) || {};
+    const parseToken = (token) || {};
     setIsLoading(true);
 
     const fetchData = async () => {
