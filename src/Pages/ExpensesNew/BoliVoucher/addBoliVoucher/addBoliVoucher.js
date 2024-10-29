@@ -101,6 +101,8 @@ const AddBoliVoucher = ({ onSuccess }) => {
 
     const submissionData = {
       expenseType: "expensevoucher",
+      date: new Date().toISOString().split("T")[0],
+      time: new Date().toLocaleTimeString(),
       narration: formData.narration,
       city: formData.city,
       pincode: formData.pincode,

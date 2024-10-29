@@ -3,184 +3,226 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { API_BASE_URL } from "../../../../utils/config";
+import { API_BASE_URL, WEB_BASE_URL } from "../../../../utils/config";
 import { Multiselect } from "multiselect-react-dropdown";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 import Section from "@aio/components/Section";
 import styles from "../event.module.css";
-import 'react-toastify/dist/ReactToastify.css';
-import Spinner from '../../../components/Spinner';
+import "react-toastify/dist/ReactToastify.css";
+import Spinner from "../../../components/Spinner";
+import { useRef } from "react";
 
 export default function UpdateEvent({ eventId, onSuccess }) {
   const [eventName, setEventName] = useState("");
   const [eventDetail, setEventDetail] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [existingEventCategory, setexistingEventCategory] = useState([]);
-  const [SelectedOption, setSelectedOption] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const options = [
-    { key: "option1", value: "Option 1" },
-    { key: "option2", value: "Option 2" },
-    { key: "option3", value: "Option 3" },
-  ];
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [existingEventCategory, setExistingEventCategory] = useState([]);
   const [eventCategory, setEventCategory] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [image, setImage] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const imageInputRef = useRef(null);
 
-  const router = useRouter();
-  const slug = router.query;
-
-  const [error, setError] = useState("");
-
-  const handleDateChange = (date) => {
-    setStartDate(date);
-    if (date instanceof Date && !isNaN(date)) {
-      setError("");
-    } else {
-      setError("Invalid date format. Please enter a valid date.");
-    }
-  };
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-    if (date instanceof Date && !isNaN(date)) {
-      setError("");
-    } else {
-      setError("Invalid date format. Please enter a valid date.");
-    }
-  };
-  const onSelect = (selectedList) => {
-    const selectedIds = selectedList.map(item => item.key);
-    setEventCategory(selectedIds);
-  };
-
-  const onRemove = (selectedList) => {
-    const selectedIds = selectedList.map(item => item.key);
-    setEventCategory(selectedIds);
-  };
   useEffect(() => {
-    if (eventId) {
-      let jsonString = [];
-      const token = localStorage.getItem('token');
-      const parseToken = (token) || {};
-      const fetchData = async () => {
-        const response = await fetch(`${API_BASE_URL}/event/getevent/${eventId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${parseToken}`,
+    const token = localStorage.getItem("token");
+    const parseToken = token || "";
 
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/event/getAllCategory`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${parseToken}`,
           },
-          body: JSON.stringify(),
         });
 
         if (response.ok) {
-
           const data = await response.json();
-          jsonString = data.data;
-
-          if (jsonString) {
-            const existingObject = jsonString;
-            // setExistingData(existingObject);
-            setEventName(existingObject.eventName || '');
-            setEventDetail(existingObject.eventDetail || '');
-            setStartDate(existingObject.startDate ? new Date(existingObject.startDate) : null);
-            setEndDate(existingObject.endDate ? new Date(existingObject.endDate) : null);
-            const selectedOption = existingObject.eventCategory.map(item => {
-              return { key: item._id, value: item.name };
-            });
-            setSelectedOption(selectedOption);
-            setEventCategory(existingObject.eventCategory.map(item => item._id));
-
-          }
+          setExistingEventCategory(data.data || []);
         } else {
-          const data = await response.json();
-          console.error(data.errorMessage);
-          alert(data.errorMessage);
+          const errorData = await response.json();
+          toast.error(errorData.errorMessage || "Failed to fetch categories.", {
+            position: toast.POSITION.TOP_RIGHT,
+          });
         }
+      } catch (err) {
+        toast.error("Network error: " + err.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
-      fetchData();
-    }
-  }, [eventId]);
-  useEffect(() => {
+    };
 
-    const token = localStorage.getItem('token');
-    const parseToken = (token) || {};
-    const fetchData = async () => {
-      const response = await fetch(`${API_BASE_URL}/event/getAllCategory`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${parseToken}`,
+    const fetchEventData = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/event/getevent/${eventId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${parseToken}`,
+            },
+          }
+        );
 
-        },
-        body: JSON.stringify(),
-      });
+        if (response.ok) {
+          const data = await response.json();
+          const {
+            startDate: start,
+            endDate: end,
+            eventName,
+            eventDetail,
+            eventCategory,
+            image,
+          } = data.data;
 
-      if (response.ok) {
-
-        const data = await response.json();
-        setexistingEventCategory(data.data)
-
-      } else {
-        const data = await response.json();
-        console.error(data.errorMessage);
-        alert(data.errorMessage);
+          setStartDate(new Date(start));
+          setEndDate(new Date(end));
+          setEventName(eventName);
+          setEventDetail(eventDetail);
+          setEventCategory(eventCategory.map((cat) => cat._id));
+          setUploadedImage(image);
+        } else {
+          const errorData = await response.json();
+          toast.error(
+            errorData.errorMessage || "Failed to fetch event details.",
+            {
+              position: toast.POSITION.TOP_RIGHT,
+            }
+          );
+        }
+      } catch (err) {
+        toast.error("Network error: " + err.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
-    }
+    };
+
     fetchData();
-  }, []);
+    fetchEventData();
+  }, [eventId]);
 
-  const customYearDropdown = ({ year, onChange }) => {
-    const yearOptions = [];
-    const startYear = year - 20; // Show 20 years before the selected year
-
-    for (let i = 0; i < 40; i++) {
-      // Show 40 years in the dropdown (20 years before and after the selected year)
-      yearOptions.push(
-        <option key={startYear + i} value={startYear + i}>
-          {startYear + i}
-        </option>
-      );
+  const handleImageInputChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setUploadedImage(URL.createObjectURL(file));
     }
   };
 
-  const addEvent = () => {
-    if (eventName.trim() === "" || eventDetail.trim() === "") {
-      alert("Please fill required fields.");
-      return;
-    }
+  const onSelect = (selectedList) => {
+    setEventCategory(selectedList.map((item) => item.key));
+  };
 
+  const onRemove = (selectedList) => {
+    setEventCategory(selectedList.map((item) => item.key));
+  };
+
+  const uploadImage = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
-    setIsLoading(true);
+    const parseToken = token || "";
+    const formData = new FormData();
+    formData.append("image", image);
 
-    const fetchData = async () => {
-      const response = await fetch(`${API_BASE_URL}/event/updateevent/${eventId}`, {
-        method: "PUT",
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/upload`, {
+        method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${parseToken}`,
         },
-        body: JSON.stringify({ eventName, eventDetail, startDate, endDate, eventCategory }),
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        toast.success('Update successfully', {
+        return data.imageUrl; // Adjust based on your API response
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.errorMessage || "Image upload failed.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
+    } catch (err) {
+      toast.error("Network error: " + err.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    return null; // In case of failure
+  };
+
+  const updateEvent = async () => {
+    if (
+      !eventName.trim() ||
+      !eventDetail.trim() ||
+      !startDate ||
+      !endDate ||
+      eventCategory.length === 0
+    ) {
+      toast.error("Please fill all required fields.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      return;
+    }
+
+    if (endDate <= startDate) {
+      toast.error("End date must be after start date.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    let imageUrl = uploadedImage; // Default to existing image URL
+
+    if (image) {
+      imageUrl = await uploadImage(); // Upload the new image and get the URL
+      if (!imageUrl) {
+        setIsLoading(false);
+        return; // Stop if the image upload failed
+      }
+    }
+
+    const eventData = {
+      eventName,
+      eventDetail,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      eventCategory,
+      image: imageUrl, // Use the new or existing image URL
+    };
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/event/updateevent/${eventId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        }
+      );
+
+      if (response.ok) {
+        toast.success("Event updated successfully", {
           position: toast.POSITION.TOP_RIGHT,
         });
         onSuccess();
-        router.push("/event");
-        setIsLoading(false);
       } else {
-        const data = await response.json();
-        toast.error(data.errorMessage, {
+        const errorData = await response.json();
+        toast.error(errorData.errorMessage || "Failed to update event.", {
           position: toast.POSITION.TOP_RIGHT,
         });
-        setIsLoading(false);
       }
-    };
-    fetchData();
+    } catch (err) {
+      toast.error("Network error: " + err.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -190,13 +232,11 @@ export default function UpdateEvent({ eventId, onSuccess }) {
         <ToastContainer position="top-right" autoClose={5000} />
 
         <div className="addDonarForm">
-          <h2 className={`${styles.formHeaderext}`}>Update event&apos;s details</h2>
+          <h2 className={styles.formHeaderext}>Update Event Details</h2>
           <form>
             <div className="formMainDiv">
-
               <div className="label-form eventInp">
                 <label htmlFor="name">Event Name</label>
-                <br />
                 <input
                   type="text"
                   id="name"
@@ -205,56 +245,65 @@ export default function UpdateEvent({ eventId, onSuccess }) {
                 />
               </div>
               <div className="label-form eventInp">
-                <label htmlFor="Event category">Event category</label>
-                <br />
+                <label htmlFor="eventCategory">Event Category</label>
                 <Multiselect
-                  options={existingEventCategory.map(category => ({ key: category._id, value: category.name }))}
-                  selectedValues={SelectedOption}
-                  // selectedValues={eventCategory.map(id => ({ key: id, value: '' }))} 
-                  placeholder=""
-
+                  options={existingEventCategory.map((category) => ({
+                    key: category._id,
+                    value: category.name,
+                  }))}
                   displayValue="value"
                   onSelect={onSelect}
                   onRemove={onRemove}
+                  selectedValues={existingEventCategory
+                    .filter((cat) => eventCategory.includes(cat._id))
+                    .map((cat) => ({ key: cat._id, value: cat.name }))}
                 />
               </div>
 
-
               <div className="label-form eventInp">
                 <label htmlFor="startDate">Start Date</label>
-                <br />
                 <DatePicker
                   showYearDropdown
-                  yearDropdownItemNumber={100}
-                  scrollableYearDropdown
                   selected={startDate}
-                  onChange={handleDateChange}
+                  onChange={(date) => setStartDate(date)}
                   dateFormat="MM/dd/yyyy"
                 />
               </div>
               <div className="label-form eventInp">
                 <label htmlFor="endDate">End Date</label>
-                <br />
                 <DatePicker
                   showYearDropdown
-                  yearDropdownItemNumber={100}
-                  scrollableYearDropdown
                   selected={endDate}
-                  onChange={handleEndDateChange}
+                  onChange={(date) => setEndDate(date)}
                   dateFormat="MM/dd/yyyy"
                 />
               </div>
-              <div className="label-form ">
+              <div className="label-form">
                 <label htmlFor="eventDetail">Event Detail</label>
-                <br />
                 <textarea
                   className="textareaEvent"
-                  type="text"
                   id="eventDetail"
                   value={eventDetail}
                   onChange={(e) => setEventDetail(e.target.value)}
                 />
               </div>
+              <input
+                type="file"
+                name="image"
+                onChange={handleImageInputChange}
+                accept="image/*"
+                ref={imageInputRef}
+                className="bg-gray-50 border border-gray-300 rounded-md w-full text-gray-900"
+              />
+              {uploadedImage && (
+                <div className="mt-4">
+                  <img
+                    src={uploadedImage}
+                    alt="Uploaded Preview"
+                    className="w-40 h-40 rounded-md"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="d-flex">
@@ -262,12 +311,11 @@ export default function UpdateEvent({ eventId, onSuccess }) {
                 <button
                   className="addDonarSubmitBtn"
                   type="button"
-                  onClick={addEvent}
+                  onClick={updateEvent}
                 >
-                  Submit
+                  Update
                 </button>
               </div>
-              <div className="nextDonarSubmitBtnMain"></div>
             </div>
           </form>
         </div>

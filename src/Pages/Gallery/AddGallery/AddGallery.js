@@ -14,48 +14,76 @@ const AddGallery = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState("en");
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files); // Get all selected files
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
     if (files.length > 0) {
-      setFormData({ images: files }); // Update state with the selected files
-      const previews = files.map((file) => URL.createObjectURL(file)); // Create previews for all files
-      setImagePreviews(previews); // Set the previews state
+      setImagePreviews((prev) => [
+        ...prev,
+        ...files.map((file) => URL.createObjectURL(file)),
+      ]);
+      for (const file of files) {
+        await uploadImage(file);
+      }
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const submissionData = new FormData();
-      formData.images.forEach((image) => {
-        submissionData.append("image", image); // Append each image with array notation
-      });
+  const uploadImage = async (image) => {
+    const uploadData = new FormData();
+    uploadData.append("image", image); // Append the single image
 
-      const token = Cookies.get("token");
-      const response = await fetch(`${API_BASE_URL}/gallery/createGallery`, {
+    const token = Cookies.get("token");
+    try {
+      setIsLoading(true);
+      const uploadResponse = await fetch(`${API_BASE_URL}/auth/upload`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          // Do not set Content-Type for FormData
         },
-        body: submissionData,
+        body: uploadData,
       });
 
-      const responseData = await response.json();
+      const uploadResponseData = await uploadResponse.json();
 
-      if (!response.ok) {
-        throw new Error(responseData.message || "Network response was not ok");
+      if (!uploadResponse.ok) {
+        throw new Error(uploadResponseData.message || "Failed to upload image");
+      }
+      const uploadedImageUrl = uploadResponseData.imageUrl; 
+      setFormData((prev) => ({
+        images: [...prev.images, uploadedImageUrl], // Ensure the uploaded URL is added correctly
+      }));
+    } catch (error) {
+      toast.error("Error: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createGallery = async () => {
+    const galleryData = {
+      image: formData.images, // Ensure no null or undefined values are sent
+    };
+
+    const token = Cookies.get("token");
+    try {
+      const galleryResponse = await fetch(`${API_BASE_URL}/gallery/createGallery`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(galleryData),
+      });
+
+      const galleryResponseData = await galleryResponse.json();
+
+      if (!galleryResponse.ok) {
+        throw new Error(galleryResponseData.message || "Failed to create gallery");
       }
 
       toast.success("Gallery created successfully!");
       onSuccess();
-      setFormData({ images: [] });
-      setImagePreviews([]);
     } catch (error) {
-      toast.error("Error creating gallery: " + error.message);
-    } finally {
-      setIsLoading(false);
+      toast.error("Error: " + error.message);
     }
   };
 
@@ -99,7 +127,7 @@ const AddGallery = ({ onSuccess }) => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2 p-4 bg-white">
+      <form className="space-y-2 p-4 bg-white">
         <div className="grid">
           <label className="block">
             {headings.uploadImages}
@@ -128,8 +156,9 @@ const AddGallery = ({ onSuccess }) => {
 
         <div>
           <button
-            type="submit"
+            type="button" // Change to button to prevent form submission
             className="mt-4 p-2 bg-green-500 text-white rounded"
+            onClick={createGallery} // Trigger gallery creation
           >
             {headings.submitGallery}
           </button>

@@ -3,17 +3,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { API_BASE_URL } from "../../../../utils/config";
+import { API_BASE_URL, WEB_BASE_URL } from "../../../../utils/config";
 import { Multiselect } from "multiselect-react-dropdown";
 import { ToastContainer, toast } from "react-toastify";
 import Section from "@aio/components/Section";
 import styles from "../event.module.css";
 import "react-toastify/dist/ReactToastify.css";
 import Spinner from "../../../components/Spinner";
+import { useRef } from "react";
 
 export default function AddEvent({ onSuccess }) {
   const [eventName, setEventName] = useState("");
-  const [image, setImage] = useState(null);
   const [eventDetail, setEventDetail] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -21,12 +21,80 @@ export default function AddEvent({ onSuccess }) {
   const [eventCategory, setEventCategory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [image, setImage] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const imageInputRef = useRef(null);
+
+  const acceptedFileTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+  const handleImageInputChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file && acceptedFileTypes.includes(file.type)) {
+      setImage(file);
+      await handleUpload(file); // Automatically upload the image
+    } else {
+      toast.error("Invalid image type. Please upload only JPEG or PNG files.");
+      resetImageInput();
+    }
+  };
+
+  const resetImageInput = () => {
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
+  };
+
+  const uploadImage = async (imageFile) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `HTTP error! Status: ${response.status}. Response: ${errorBody}`
+        );
+      }
+
+      const resData = await response.json();
+      console.log("Image upload response:", resData);
+
+      if (resData?.imageUrl) {
+        return { imageUrl: resData.imageUrl };
+      } else {
+        throw new Error("Image URL not found in response.");
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+      return { error: error.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpload = async (file) => {
+    const { imageUrl, error } = await uploadImage(file);
+    if (imageUrl) {
+      setUploadedImage(imageUrl);
+    }
+    if (error) {
+      console.error(error);
+    }
+  };
 
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
+    const parseToken = token || {};
 
     const fetchData = async () => {
       try {
@@ -99,22 +167,42 @@ export default function AddEvent({ onSuccess }) {
     }
 
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
+    const parseToken = token ? token : ""; // Use empty string if token is null
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("eventName", eventName);
-      formData.append("eventDetail", eventDetail);
-      formData.append("startDate", startDate.toISOString());
-      formData.append("endDate", endDate.toISOString());
-      formData.append("eventCategory", JSON.stringify(eventCategory));
+      let imageUrl = null;
 
-      if (image) formData.append("image", image);
+      // Upload the image if it exists
+      if (image) {
+        const { imageUrl: uploadedImageUrl, error } = await uploadImage(image);
+        if (error) {
+          console.error(error);
+          toast.error("Failed to upload image.");
+          return; // Exit if image upload fails
+        }
+        imageUrl = uploadedImageUrl;
+      }
+
+      // Create the event data object with the image URL
+      const eventData = {
+        eventName,
+        eventDetail,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        eventCategory,
+        image: imageUrl, // Use the uploaded image URL
+      };
+
+      console.log(eventData); // Log the object
 
       const response = await fetch(`${API_BASE_URL}/event/addevent`, {
         method: "POST",
-        body: formData,
+        headers: {
+          Authorization: `Bearer ${parseToken}`,
+          "Content-Type": "application/json", // Set the correct content type
+        },
+        body: JSON.stringify(eventData), // Convert the object to JSON
       });
 
       if (response.ok) {
@@ -198,27 +286,24 @@ export default function AddEvent({ onSuccess }) {
                   onChange={(e) => setEventDetail(e.target.value)}
                 />
               </div>
-              <div>
-                <label className="block">
-                  Image
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="mt-1 border border-gray-300 rounded p-2 w-full"
+              <input
+                type="file"
+                name="image"
+                onChange={handleImageInputChange}
+                accept="image/*"
+                ref={imageInputRef}
+                className="bg-gray-50 border border-gray-300 rounded-md w-full text-gray-900"
+                required
+              />
+              {uploadedImage && (
+                <div className="mt-4">
+                  <img
+                    src={WEB_BASE_URL + "/" + uploadedImage}
+                    alt="Uploaded Preview"
+                    className="max-w-full h-auto rounded-md"
                   />
-                </label>
-                {imagePreview && (
-                  <div className="mt-4">
-                    <img
-                      src={imagePreview}
-                      alt="Image Preview"
-                      className="border border-gray-300 rounded mt-2"
-                      style={{ maxHeight: "200px", maxWidth: "100%" }}
-                    />
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="d-flex">

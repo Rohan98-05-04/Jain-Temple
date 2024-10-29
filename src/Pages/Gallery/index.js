@@ -4,7 +4,7 @@ import Pagination from "react-js-pagination";
 import Section from "@aio/components/Section";
 import { AiFillDelete, AiFillEdit, AiOutlineSearch } from "react-icons/ai";
 import { GrView } from "react-icons/gr";
-import { API_BASE_URL } from "utils/config";
+import { API_BASE_URL, WEB_BASE_URL } from "utils/config";
 import Spinner from "src/components/Spinner";
 import { toast } from "react-toastify";
 import ModalVideo from "./AddGallery/ModalAddGallery";
@@ -30,7 +30,7 @@ const Gallery = () => {
 
   const fetchEvents = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
+    const parseToken = token || {};
     setIsLoading(true);
     const response = await fetch(
       `${API_BASE_URL}/gallery/getAllGalleries?page=${activePage}&size=${size}&search=${search}`,
@@ -74,7 +74,7 @@ const Gallery = () => {
 
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
+    const parseToken = token || {};
 
     setIsLoading(true);
     const response = await fetch(
@@ -147,9 +147,20 @@ const Gallery = () => {
               <tbody>
                 {donationData?.map((donation, index) => (
                   <tr key={index} className="hover:bg-gray-100">
-                    <td className="py-2 px-4 border-b text-center">{index + 1}</td>
+                    <td className="py-2 px-4 border-b text-center">
+                      {index + 1}
+                    </td>
                     <td className="py-2 px-4 border">
-                        <img src={donation.image} className="w-20 h-20" />
+                      <div className="flex">
+                        {donation.image.map((img, index) => (
+                          <img
+                            key={index}
+                            src={`${WEB_BASE_URL}/${img}`}
+                            alt={`Donation image ${index + 1}`}
+                            className="w-20 h-20 mr-8"
+                          />
+                        ))}
+                      </div>
                     </td>
                     <td className="py-2 px-4 border-b">
                       <button
@@ -195,13 +206,13 @@ const Gallery = () => {
         Id={Id}
         onRefresh={handleRefresh}
       />
-     
+
       <ModalConfirmDelete
         isOpen={isConfirmDeleteOpen}
         onClose={closeConfirmDeleteModal}
         onConfirm={handleDelete}
         onRefresh={handleRefresh}
-      /> 
+      />
     </div>
   );
 };

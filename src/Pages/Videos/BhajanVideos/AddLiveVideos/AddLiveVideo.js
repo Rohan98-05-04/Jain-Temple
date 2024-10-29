@@ -13,6 +13,7 @@ const AddLiveVideo = ({ onSuccess }) => {
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [language, setLanguage] = useState("en");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,7 +24,6 @@ const AddLiveVideo = ({ onSuccess }) => {
     const file = e.target.files[0];
     setFormData({ ...formData, image: file });
     
-    // Create a preview URL for the selected image
     if (file) {
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
@@ -32,26 +32,53 @@ const AddLiveVideo = ({ onSuccess }) => {
     }
   };
 
+  const uploadImage = async (imageFile) => {
+    const token = Cookies.get("token");
+    const imageData = new FormData();
+    imageData.append("image", imageFile);
+
+    const response = await fetch(`${API_BASE_URL}/auth/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: imageData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Image upload failed");
+    }
+
+    const result = await response.json();
+    return result.imageUrl; // Assuming the response contains the uploaded image URL
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const submissionData = new FormData();
-      submissionData.append("videoLink", formData.videoLink);
+      let imageUrl = null;
+
       if (formData.image) {
-        submissionData.append("image", formData.image);
+        imageUrl = await uploadImage(formData.image);
       }
 
-      const token = Cookies.get("token");
+      const submissionData = {
+        videoLink: formData.videoLink,
+        image : imageUrl, // Include the image URL
+      };
 
+      const token = Cookies.get("token");
       const response = await fetch(
         `${API_BASE_URL}/bhashan/createBhashan`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
-          body: submissionData,
+          body: JSON.stringify(submissionData),
         }
       );
 
@@ -60,7 +87,6 @@ const AddLiveVideo = ({ onSuccess }) => {
         throw new Error(errorData.message || "Network response was not ok");
       }
 
-      const result = await response.json();
       toast.success("Bhajan submitted successfully!");
       onSuccess();
 
@@ -68,15 +94,13 @@ const AddLiveVideo = ({ onSuccess }) => {
         videoLink: "",
         image: null,
       });
-      setImagePreview(null); // Clear preview after submission
+      setImagePreview(null);
     } catch (error) {
       toast.error("Error submitting donation: " + error.message);
     } finally {
       setIsLoading(false);
     }
   };
-
-  const [language, setLanguage] = useState("en");
 
   const toggleLanguage = (lang) => {
     setLanguage(lang);

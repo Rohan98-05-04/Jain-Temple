@@ -1,93 +1,123 @@
 import Section from "@aio/components/Section";
 import Cookies from "js-cookie";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Spinner from "src/components/Spinner";
-import { API_BASE_URL } from "utils/config";
+import { API_BASE_URL, WEB_BASE_URL } from "utils/config";
 
-const UpdateGallery = ({ onSuccess, galleryId }) => {
+const UpdateGallery = ({ galleryId, onSuccess }) => {
   const [formData, setFormData] = useState({
-    image: null,
+    images: [],
   });
-  const [imagePreview, setImagePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [language, setLanguage] = useState("en");
 
   useEffect(() => {
-    if (galleryId) {
-      fetchGalleryData(galleryId);
-    }
+    const fetchGallery = async () => {
+      const token = Cookies.get("token");
+      try {
+        const response = await fetch(`${API_BASE_URL}/gallery/getGalleryById/${galleryId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch gallery");
+        }
+
+        setFormData({ images: data.data.image });
+        setImagePreviews(data.data.image);
+      } catch (error) {
+        toast.error("Error: " + error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGallery();
   }, [galleryId]);
 
-  const fetchGalleryData = async (id) => {
-    setIsLoading(true);
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      const newPreviews = files.map((file) => URL.createObjectURL(file));
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
+      for (const file of files) {
+        await uploadImage(file);
+      }
+    }
+  };
+
+  const uploadImage = async (image) => {
+    const uploadData = new FormData();
+    uploadData.append("image", image);
+
+    const token = Cookies.get("token");
     try {
-      const token = Cookies.get("token");
-      const response = await fetch(`${API_BASE_URL}/gallery/getGalleryById/${id}`, {
-        method: "GET",
+      const uploadResponse = await fetch(`${API_BASE_URL}/auth/upload`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        body: uploadData,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch gallery data");
+      const uploadResponseData = await uploadResponse.json();
+
+      if (!uploadResponse.ok) {
+        throw new Error(uploadResponseData.message || "Failed to upload image");
       }
 
-      const data = await response.json();
-      if (data.success) {
-        const image = data.data; // Assuming data.data is an array
-        setFormData({ image });
-        setImagePreview(image.image); // Use the existing image URL for the preview
-      } else {
-        throw new Error("Gallery not found");
-      }
+      const uploadedImageUrl = uploadResponseData.imageUrl;
+      setFormData((prev) => ({
+        images: [...prev.images, uploadedImageUrl],
+      }));
     } catch (error) {
-      toast.error("Error fetching gallery: " + error.message);
-    } finally {
-      setIsLoading(false);
+      toast.error("Error: " + error.message);
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]; // Only handle the first file
-    if (file) {
-      setFormData({ image: file });
-      setImagePreview(URL.createObjectURL(file)); // Set the preview for the selected file
-    }
+  const removeImage = (index) => {
+    const updatedImages = [...imagePreviews];
+    updatedImages.splice(index, 1); // Remove the image at the given index
+    setImagePreviews(updatedImages);
+
+    // Also remove from formData
+    setFormData((prev) => ({
+      images: prev.images.filter((_, i) => i !== index), // Remove from the images array
+    }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const updateGallery = async () => {
+    const galleryData = {
+      image: formData.images,
+    };
+
+    const token = Cookies.get("token");
     try {
-      const submissionData = new FormData();
-      submissionData.append("image", formData.image); // Append the single image
-
-      const token = Cookies.get("token");
-      const response = await fetch(`${API_BASE_URL}/gallery/updateGallery/${galleryId}`, {
+      const galleryResponse = await fetch(`${API_BASE_URL}/gallery/updateGallery/${galleryId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: submissionData,
+        body: JSON.stringify(galleryData),
       });
 
-      const responseData = await response.json();
+      const galleryResponseData = await galleryResponse.json();
 
-      if (!response.ok) {
-        throw new Error(responseData.message || "Network response was not ok");
+      if (!galleryResponse.ok) {
+        throw new Error(galleryResponseData.message || "Failed to update gallery");
       }
 
       toast.success("Gallery updated successfully!");
       onSuccess();
-      setFormData({ image: null });
-      setImagePreview(null);
     } catch (error) {
-      toast.error("Error updating gallery: " + error.message);
-    } finally {
-      setIsLoading(false);
+      toast.error("Error: " + error.message);
     }
   };
 
@@ -95,11 +125,9 @@ const UpdateGallery = ({ onSuccess, galleryId }) => {
     setLanguage(lang);
   };
 
-  const isHindi = language === "hi";
-
   const headings = {
-    uploadImage: isHindi ? "छवि अपलोड करें:" : "Upload Image:",
-    submitGallery: isHindi ? "गैलरी सबमिट करें" : "Submit Gallery",
+    uploadImages: language === "hi" ? "छवि अपलोड करें:" : "Upload Images:",
+    submitGallery: language === "hi" ? "गैलरी अपडेट करें" : "Update Gallery",
   };
 
   return (
@@ -131,33 +159,47 @@ const UpdateGallery = ({ onSuccess, galleryId }) => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2 p-4 bg-white">
+      <form className="space-y-2 p-4 bg-white">
         <div className="grid">
           <label className="block">
-            {headings.uploadImage}
+            {headings.uploadImages}
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
+              multiple
               className="mt-1 border border-gray-300 rounded p-2 w-full"
             />
           </label>
-          {imagePreview && (
-            <div className="mt-4">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="border border-gray-300 rounded"
-                style={{ maxHeight: "200px", maxWidth: "100px" }}
-              />
+          {imagePreviews.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-4 relative">
+              {imagePreviews.map((preview, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={WEB_BASE_URL + "/" + preview}
+                    alt={`Preview ${index + 1}`}
+                    className="border border-gray-300 rounded"
+                    style={{ maxHeight: "200px", maxWidth: "100px" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                    style={{ margin: "5px" }}
+                  >
+                    ✖
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
         <div>
           <button
-            type="submit"
+            type="button"
             className="mt-4 p-2 bg-green-500 text-white rounded"
+            onClick={updateGallery}
           >
             {headings.submitGallery}
           </button>
