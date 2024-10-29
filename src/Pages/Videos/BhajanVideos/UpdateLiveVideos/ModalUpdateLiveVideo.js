@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import EditLiveVideo from './UpdateLiveVideos';
+import UpdateLiveVideo from './UpdateLiveVideos';
 
 const ModalUpdateLink = ({ isOpen, onClose, Id, onRefresh }) => {
     const [accepted, setAccepted] = useState(false);
@@ -37,7 +37,7 @@ const ModalUpdateLink = ({ isOpen, onClose, Id, onRefresh }) => {
                         </h3>
                     </div>
                     <div className="p-4 md:p-5 space-y-4">
-                        <EditLiveVideo id={Id} onSuccess={handleSignUpSuccess} />
+                        <UpdateLiveVideo id={Id} onSuccess={handleSignUpSuccess} />
                     </div>
                 </div>
             </div>

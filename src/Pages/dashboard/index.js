@@ -117,11 +117,11 @@ export default function Dashboard() {
       },
     },
   };
-  const donationMonths = donationMonthlyData?.map((item) => item.monthName);
-  const donationAmounts = donationMonthlyData?.map((item) => item.donation);
+  const donationMonths = donationMonthlyData?.donation?.map((item) => item.monthName);
+  const donationAmounts = donationMonthlyData?.donation?.map((item) => item.donation);
 
-  const expenseMonths = expenseMonthlyData?.map((item) => item.monthName);
-  const expenseAmounts = expenseMonthlyData?.map((item) => item.donation);
+  const expenseMonths = expenseMonthlyData?.expense?.map((item) => item.monthName);
+  const expenseAmounts = expenseMonthlyData?.expense?.map((item) => item.expense);
 
   const data = {
     labels: donationMonths,
@@ -150,7 +150,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
+    const parseToken = token || {};
     const fetchData = async () => {
       const response = await fetch(`${API_BASE_URL}/users/getDashboard`, {
         method: "GET",
@@ -174,6 +174,32 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const parseToken = token || {};
+    const fetchData = async () => {
+      const response = await fetch(`${API_BASE_URL}/donationDetail/totalMothBalance`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${parseToken}`,
+        },
+        body: JSON.stringify(),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDonationMonthlyData(data.data);
+        setExpenseMonthlyData(data.data);
+      } else {
+        const data = await response.json();
+        console.error(data.errorMessage);
+        alert(data.errorMessage);
+      }
+    };
+    fetchData();
+  }, []);
+
   const handleSubmit = () => {
     alert("Submit is working..!");
     handleClose();
@@ -185,21 +211,14 @@ export default function Dashboard() {
       <HeaderSection
         heading={"Dashboard"}
         subHeading={"Welcome"}
-        // rightItem={() => (
-        //   <ActionButton
-        //     onClick={() => setModal(true)}
-        //     Icon={AiOutlinePlusCircle}
-        //     label="Add New User"
-        //   />
-        // )}
       />
 
       <Section>
         <h3>Today&apos;s data</h3>
 
-        <Link href={"/event-data"} className={styles.eventDataBtn}>
+        {/* <Link href={"/event-data"} className={styles.eventDataBtn}>
           Events amount
-        </Link>
+        </Link> */}
         <div className={styles.container}>
           <div className={styles.box}>
             <div>
@@ -269,9 +288,9 @@ export default function Dashboard() {
           </div>
           <div className={styles.box}>
             <div>
-              <p className={styles.boxHead}>Today&apos;s Cash Balance</p>
+              <p className={styles.boxHead}>Today&apos;s Cheque Donation</p>
               <p className={styles.boxAmount}>
-                {allData?.todaysCashBalance} Rs.
+                {allData?.todaysChequeDonations} Rs.
               </p>
             </div>
             <div className={styles.iconContainer}>
@@ -280,10 +299,8 @@ export default function Dashboard() {
           </div>
           <div className={styles.box}>
             <div>
-              <p className={styles.boxHead}>Today&apos;s Online Balance</p>
-              <p className={styles.boxAmount}>
-                {allData?.todaysOnlineBalance} Rs.
-              </p>
+              <p className={styles.boxHead}>Today&apos;s Item Donation</p>
+              <p className={styles.boxAmount}>{allData?.todaysItemDonations}</p>
             </div>
             <div className={styles.iconContainer}>
               <MdOutlinePayment size={30} />
@@ -382,7 +399,7 @@ export default function Dashboard() {
             <div>
               <p className={styles.boxHead}>Total&apos;s Online Donation</p>
               <p className={styles.boxAmount}>
-                {allData?.totalOverallCheque} Rs.
+                {allData?.totalOverallOnline} Rs.
               </p>
             </div>
             <div className={styles.iconContainer}>
@@ -391,9 +408,9 @@ export default function Dashboard() {
           </div>
           <div className={styles.box}>
             <div>
-              <p className={styles.boxHead}>Total&apos;s Cash Balance</p>
+              <p className={styles.boxHead}>Total&apos;s Cheque Donation</p>
               <p className={styles.boxAmount}>
-                {allData?.overallCashBalance} Rs.
+                {allData?.totalOverallCheque} Rs.
               </p>
             </div>
             <div className={styles.iconContainer}>
@@ -402,10 +419,8 @@ export default function Dashboard() {
           </div>
           <div className={styles.box}>
             <div>
-              <p className={styles.boxHead}>Total&apos;s Online Balance</p>
-              <p className={styles.boxAmount}>
-                {allData?.overallOnlineBalance} Rs.
-              </p>
+              <p className={styles.boxHead}>Total&apos;s Items</p>
+              <p className={styles.boxAmount}>{allData?.totalOverallItem}</p>
             </div>
             <div className={styles.iconContainer}>
               <MdOutlinePayment size={30} />
@@ -427,22 +442,22 @@ export default function Dashboard() {
       <hr />
       <Section>
         <h3>Top donation</h3>
-        <table className="table">
-          <thead>
+        <table className="min-w-full text-left border border-gray-300">
+          <thead className="bg-gray-100">
             <tr>
-              <th scope="col">Donor Name</th>
-              <th scope="col">Donor Number</th>
-              <th scope="col">Payment Type</th>
-              <th scope="col">Donation Amount</th>
+              <th className="py-2 px-4 text-nowrap border-b">Donor Name</th>
+              <th className="py-2 px-4 text-nowrap border">Donor Number</th>
+              <th className="py-2 px-4 text-nowrap border">Payment Type</th>
+              <th className="py-2 px-4 text-nowrap border">Donation Amount</th>
             </tr>
           </thead>
           <tbody>
             {allData?.topDonations.map((donation, index) => (
               <tr key={index}>
-                <td>{donation.fullname}</td>
-                <td>{donation.mobile}</td>
-                <td>{donation.paymentType}</td>
-                <td>{donation.totalAmount}</td>
+                <td className="py-2 px-4 border">{donation.fullname}</td>
+                <td className="py-2 px-4 border">{donation.mobile}</td>
+                <td className="py-2 px-4 border">{donation.paymentType}</td>
+                <td className="py-2 px-4 border">{donation.totalAmount}</td>
               </tr>
             ))}
           </tbody>

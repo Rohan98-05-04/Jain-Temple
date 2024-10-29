@@ -4,7 +4,7 @@ import Pagination from "react-js-pagination";
 import Section from "@aio/components/Section";
 import { AiFillDelete, AiFillEdit, AiOutlineSearch } from "react-icons/ai";
 import { GrView } from "react-icons/gr";
-import { API_BASE_URL } from "utils/config";
+import { API_BASE_URL, WEB_BASE_URL } from "utils/config";
 import Spinner from "src/components/Spinner";
 import ModalVideo from "./AddLiveVideos/ModalAddLiveVideo";
 import ModalUpdateLink from "./UpdateLiveVideos/ModalUpdateLiveVideo";
@@ -30,7 +30,7 @@ const BhajanVideos = () => {
 
   const fetchEvents = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
+    const parseToken = token || {};
     setIsLoading(true);
     const response = await fetch(
       `${API_BASE_URL}/bhashan/getAllBhashans?page=${activePage}&size=${size}&search=${search}`,
@@ -74,7 +74,7 @@ const BhajanVideos = () => {
 
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
-    const parseToken = (token) || {};
+    const parseToken = token || {};
 
     setIsLoading(true);
     const response = await fetch(
@@ -148,18 +148,24 @@ const BhajanVideos = () => {
               <tbody>
                 {donationData?.map((donation, index) => (
                   <tr key={index} className="hover:bg-gray-100">
-                    <td className="py-2 px-4 border-b text-center">{index + 1}</td>
+                    <td className="py-2 px-4 border-b text-center">
+                      {index + 1}
+                    </td>
                     <td className="py-2 px-4 border">
-                      <Link
-                        href={donation.videoLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {donation.videoLink}
-                      </Link>
+                      {donation.videoLink ? (
+                        <Link
+                          href={donation.videoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {donation.videoLink}
+                        </Link>
+                      ) : (
+                        <span>No video link available</span>
+                      )}
                     </td>
                     <td className="py-2 px-4 border w-40 ">
-                        <img src={donation.image} />
+                      <img src={WEB_BASE_URL + "/" + donation.image} />
                     </td>
                     <td className="py-2 px-4 border-b">
                       <button
